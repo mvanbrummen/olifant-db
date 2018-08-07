@@ -1,71 +1,89 @@
 package mvanbrummen.olifant.views
 
+import javafx.application.Platform
+import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.scene.layout.BorderPane
+import mvanbrummen.olifant.controllers.DatabaseController
 import tornadofx.*
-import java.time.LocalDate
+import java.lang.System.exit
 
 class MainView : View("OlifantDB") {
 
     override val root = BorderPane()
 
-    private val persons = FXCollections.observableArrayList<Person>(
-            Person(1, "Samantha Stuart", LocalDate.of(1981, 12, 4)),
-            Person(2, "Tom Marks", LocalDate.of(2001, 1, 23)),
-            Person(3, "Stuart Gills", LocalDate.of(1989, 5, 23)),
-            Person(3, "Nicole Williams", LocalDate.of(1998, 8, 11))
-    )
+    val input = SimpleStringProperty()
+
+    val dbController: DatabaseController by inject()
+
+    val data = FXCollections.observableArrayList<List<String>>()
+    val tableview = tableview(data)
 
     init {
         with(root) {
 
-            top = menubar {
-                menu("File") {
-                    menu("Connect") {
-                        item("Facebook")
-                        item("Twitter")
+            top = vbox {
+                menubar {
+                    menu("File") {
+                        item("New") {
+                            action {
+                                find(NewServerView::class).openWindow()
+                            }
+                        }
+                        item("Run") {
+                            action {
+
+                            }
+                        }
+                        item("Quit") {
+                            action {
+                                Platform.exit()
+                                exit(0)
+                            }
+                        }
                     }
-                    item("Save")
-                    item("Quit")
+
                 }
-                menu("Edit") {
-                    item("Copy")
-                    item("Paste")
+
+                toolbar {
+                    button("> Execute") {
+                        action {
+                            runAsync {
+                                dbController.executeQuery(input.value)
+                            } ui { entries ->
+                                // Generate columns based on the first row
+                                entries.first().forEachIndexed { colIndex, name ->
+                                    tableview.column(name, String::class) {
+                                        value { row ->
+                                            SimpleStringProperty(row.value[colIndex])
+                                        }
+                                    }
+                                }
+                                // Assign the extracted entries to our list, skip first row
+                                data.setAll(entries.drop(1))
+                            }
+                        }
+                    }
+                    button("Stop") {
+
+                    }
                 }
             }
+
 
             left = vbox {
                 label("Database list")
             }
 
             center = vbox {
-                textarea {
-
-                }
-                tableview(persons) {
-                    column("ID", Person::idProperty)
-                    column("Name", Person::nameProperty)
-                    column("Birthday", Person::birthdayProperty)
+                textarea(input)
+                tabpane {
+                    tab("Query 1") {
+                        tableview
+                    }
                 }
             }
         }
     }
 }
 
-class Person(id: Int, name: String, birthday: LocalDate) {
-    var id by property<Int>()
-    fun idProperty() = getProperty(Person::id)
-
-    var name by property<String>()
-    fun nameProperty() = getProperty(Person::name)
-
-    var birthday by property<LocalDate>()
-    fun birthdayProperty() = getProperty(Person::birthday)
-
-
-    init {
-        this.id = id
-        this.name = name
-        this.birthday = birthday
-    }
-}
