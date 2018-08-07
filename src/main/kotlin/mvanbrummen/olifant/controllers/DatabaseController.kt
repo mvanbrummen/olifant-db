@@ -45,6 +45,7 @@ class DatabaseController : Controller() {
                 } catch (e: Exception) {
                     println("ERROR: at index $i: " + e.message)
                     println(metaData.getColumnLabel(i) + "\n\n")
+                    row.add("error")
                 }
             }
 
