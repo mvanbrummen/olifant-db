@@ -3,6 +3,7 @@ package mvanbrummen.olifant.views
 import javafx.beans.property.SimpleStringProperty
 import mvanbrummen.olifant.Styles
 import mvanbrummen.olifant.db.DatabaseConnection
+import mvanbrummen.olifant.models.DatabaseConnectionInfo
 import org.postgresql.ds.PGSimpleDataSource
 import tornadofx.*
 
@@ -48,7 +49,21 @@ class NewServerView : Fragment("Create new connection") {
                     action {
                         val ds = getDataSource()
 
-                        DatabaseConnection.add(ds)
+                        try {
+                            val conn = ds.connection
+                            conn.createStatement().executeQuery(TEST_CONNECTION)
+                            conn.close()
+
+                            DatabaseConnection.add(ds)
+
+                            closeModal()
+                        } catch (e: Exception) {
+                            with(testConnectionLabel) {
+                                removeClass(Styles.successText)
+                                addClass(Styles.errorText)
+                            }
+                            labelText.value = "Failed to connect"
+                        }
                     }
 
                     disableProperty().bind(databaseConnection.usernameProperty().isNull.or(databaseConnection.passwordProperty().isNull))
@@ -88,32 +103,4 @@ class NewServerView : Fragment("Create new connection") {
         password = databaseConnection.passwordProperty().get()
     }
 
-    class DatabaseConnectionInfo(username: String?,
-                                 password: String?,
-                                 host: String = "localhost",
-                                 port: Int = 5432,
-                                 databaseName: String = "postgres") {
-        var username by property<String>()
-        fun usernameProperty() = getProperty(DatabaseConnectionInfo::username)
-
-        var password by property<String>()
-        fun passwordProperty() = getProperty(DatabaseConnectionInfo::password)
-
-        var host by property<String>()
-        fun hostProperty() = getProperty(DatabaseConnectionInfo::host)
-
-        var databaseName by property<String>()
-        fun databaseNameProperty() = getProperty(DatabaseConnectionInfo::databaseName)
-
-        var port by property<Int>()
-        fun portProperty() = getProperty(DatabaseConnectionInfo::port)
-
-        init {
-            this.username = username
-            this.password = password
-            this.host = host
-            this.port = port
-            this.databaseName = databaseName
-        }
-    }
 }
