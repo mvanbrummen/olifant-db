@@ -1,5 +1,7 @@
 package mvanbrummen.olifant.views
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.application.Platform
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
@@ -45,26 +47,29 @@ class MainView : View("OlifantDB") {
             }
 
             toolbar {
-                button("> Execute") {
-                    action {
-                        runAsync {
-                            dbController.executeQuery(input.value)
-                        } ui { entries ->
+                button("Execute", FontAwesomeIconView(FontAwesomeIcon.PLAY)) {
 
-                            entries.first().forEachIndexed { colIndex, name ->
-                                tableview.column(name, String::class) {
-                                    value { row ->
-                                        SimpleStringProperty(row.value[colIndex])
+                    action {
+                        if (input.value.isNotBlank()) {
+                            runAsync {
+                                dbController.executeQuery(input.value)
+                            } ui { entries ->
+
+                                entries.first().forEachIndexed { colIndex, name ->
+                                    tableview.column(name, String::class) {
+                                        value { row ->
+                                            SimpleStringProperty(row.value[colIndex])
+                                        }
                                     }
                                 }
-                            }
 
-                            data.setAll(entries.drop(1))
+                                data.setAll(entries.drop(1))
+                            }
                         }
                     }
                 }
-                button("Stop") {
-
+                button("Stop", FontAwesomeIconView(FontAwesomeIcon.STOP)) {
+                    println("stopping query...")
                 }
             }
         }
