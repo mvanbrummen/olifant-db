@@ -27,7 +27,7 @@ class MainView : View("OlifantDB") {
                 menu("File") {
                     item("New") {
                         action {
-                            find(NewServerView::class).openWindow()
+                            find(NewServerView::class).openModal()
                         }
                     }
                     item("Run") {

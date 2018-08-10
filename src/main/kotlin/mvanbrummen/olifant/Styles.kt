@@ -12,6 +12,8 @@ class Styles : Stylesheet() {
         val welcomeScreen by cssclass()
         val content by cssclass()
         val heading by cssclass()
+        val errorText by cssclass()
+        val successText by cssclass()
     }
 
     init {
@@ -29,6 +31,12 @@ class Styles : Stylesheet() {
                     fontSize = 22.px
                 }
             }
+        }
+        errorText {
+            textFill = Color.RED
+        }
+        successText {
+            textFill = Color.GREEN
         }
     }
 }
