@@ -1,21 +1,15 @@
 package mvanbrummen.olifant.controllers
 
-import com.zaxxer.hikari.HikariDataSource
+import mvanbrummen.olifant.db.DatabaseConnection
 import tornadofx.Controller
 
 
 class DatabaseController : Controller() {
 
-    val ds = HikariDataSource().apply {
-        jdbcUrl = "jdbc:postgresql://localhost:5432/postgres"
-        username = "postgres"
-        password = "postgres"
-    }
-
     fun executeQuery(queryString: String): List<List<String>> {
         println("Executing $queryString")
 
-        val conn = ds.connection
+        val conn = DatabaseConnection.getDataSource().connection
         val statement = conn.prepareStatement(queryString)
         val rs = statement.executeQuery()
 

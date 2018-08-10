@@ -7,6 +7,9 @@ import mvanbrummen.olifant.controllers.DatabaseController
 import tornadofx.*
 import java.lang.System.exit
 
+const val HEIGHT = 600.0
+const val WIDTH = 950.0
+
 class MainView : View("OlifantDB") {
 
     val dbController: DatabaseController by inject()
@@ -16,6 +19,9 @@ class MainView : View("OlifantDB") {
     val tableview = tableview(data)
 
     override val root = borderpane {
+
+        setPrefSize(WIDTH, HEIGHT)
+
         top = vbox {
             menubar {
                 menu("File") {
