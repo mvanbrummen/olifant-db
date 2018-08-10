@@ -27,21 +27,16 @@ class MainView : View("OlifantDB") {
         top = vbox {
             menubar {
                 menu("File") {
-                    item("New") {
-                        action {
-                            find(NewServerView::class).openModal()
-                        }
-                    }
-                    item("Run") {
-                        action {
-
-                        }
-                    }
+                    item("Preferences")
                     item("Quit") {
                         action {
                             Platform.exit()
                             exit(0)
                         }
+                    }
+                }
+                menu("Help") {
+                    item("About") {
                     }
                 }
             }
@@ -75,7 +70,18 @@ class MainView : View("OlifantDB") {
         }
 
         left = vbox {
-            label("Database list")
+            toolbar {
+                button("", FontAwesomeIconView(FontAwesomeIcon.PLUS)) {
+                    action {
+                        find(NewServerView::class).openModal()
+                    }
+                }
+                button("", FontAwesomeIconView(FontAwesomeIcon.REFRESH)) {
+                    action {
+                        println("Refreshing tree...")
+                    }
+                }
+            }
         }
 
         center = vbox {
@@ -83,7 +89,6 @@ class MainView : View("OlifantDB") {
                 tab("Query 1") {
                     textarea(input)
                 }
-                tab("Query 2")
             }
             tableview
         }
