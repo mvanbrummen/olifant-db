@@ -2,6 +2,7 @@ package mvanbrummen.olifant.controllers
 
 import mvanbrummen.olifant.db.DatabaseConnection
 import tornadofx.Controller
+import javax.sql.DataSource
 
 
 class DatabaseController : Controller() {
@@ -53,5 +54,25 @@ class DatabaseController : Controller() {
         conn.close()
 
         return rows
+    }
+
+    fun getDatabases(ds: DataSource): List<String> {
+        val queryString = "SELECT datname FROM pg_database WHERE datistemplate = false;"
+
+        val conn = ds.connection
+        val statement = conn.prepareStatement(queryString)
+        val rs = statement.executeQuery()
+
+        val databases = mutableListOf<String>()
+
+        while (rs.next()) {
+            val result = rs.getString("datname")
+
+            if (result != null) {
+                databases.add(result)
+            }
+        }
+
+        return databases
     }
 }

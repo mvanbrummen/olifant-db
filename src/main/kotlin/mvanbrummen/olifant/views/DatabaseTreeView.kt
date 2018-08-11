@@ -11,12 +11,12 @@ class DatabaseTreeView : View() {
 
     val dbTreeContext: DatabaseTreeContext by inject()
 
+    val dbConnections = dbTreeContext.databaseConnections
+
     override val root =
 
             vbox {
                 treeview<DatabaseTreeItem>(TreeItem(TreeRoot)) {
-
-                    val datbaseConnections = dbTreeContext.databaseConnections
 
                     isShowRoot = false
 
@@ -33,7 +33,7 @@ class DatabaseTreeView : View() {
                     populate { parent ->
                         val value = parent.value
                         when (value) {
-                            TreeRoot -> datbaseConnections.map { it }
+                            TreeRoot -> dbConnections.map { it }
                             is DatabaseConnection -> value.databases
                             is Database -> value.schemas
                             is Schema -> emptyList()

@@ -2,6 +2,7 @@ package mvanbrummen.olifant.views
 
 import javafx.beans.property.SimpleStringProperty
 import mvanbrummen.olifant.Styles
+import mvanbrummen.olifant.controllers.DatabaseTreeContext
 import mvanbrummen.olifant.db.DatabaseConnection
 import mvanbrummen.olifant.models.DatabaseConnectionInfo
 import org.postgresql.ds.PGSimpleDataSource
@@ -13,6 +14,8 @@ class NewServerView : Fragment("Create new connection") {
     override val root = Form()
 
     private val databaseConnection: DatabaseConnectionInfo by inject()
+
+    private val databaseTreeContext: DatabaseTreeContext by inject()
 
     val labelText = SimpleStringProperty()
     val testConnectionLabel = label(labelText)
@@ -60,6 +63,8 @@ class NewServerView : Fragment("Create new connection") {
                                 conn.close()
 
                                 DatabaseConnection.add(ds)
+
+                                databaseTreeContext.addDatabaseTreeItem(ds)
 
                                 closeModal()
                             } catch (e: Exception) {
