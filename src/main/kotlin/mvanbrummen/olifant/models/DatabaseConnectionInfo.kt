@@ -1,13 +1,13 @@
 package mvanbrummen.olifant.models;
 
+import tornadofx.ViewModel
 import tornadofx.getProperty
 import tornadofx.property
 
-class DatabaseConnectionInfo(username: String?,
-                             password: String?,
-                             host: String = "localhost",
-                             port: Int = 5432,
-                             databaseName: String = "postgres") {
+class DatabaseConnectionInfo: ViewModel() {
+
+    var connectionName by property<String>()
+    fun connectionNameProperty() = getProperty(DatabaseConnectionInfo::connectionName)
 
     var username by property<String>()
     fun usernameProperty() = getProperty(DatabaseConnectionInfo::username)
@@ -25,10 +25,9 @@ class DatabaseConnectionInfo(username: String?,
     fun portProperty() = getProperty(DatabaseConnectionInfo::port)
 
     init {
-        this.username = username
-        this.password = password
-        this.host = host
-        this.port = port
-        this.databaseName = databaseName
+        this.host = "localhost"
+        this.port = 5432
+        this.databaseName = "postgres"
     }
+
 }

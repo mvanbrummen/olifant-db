@@ -12,7 +12,7 @@ const val TEST_CONNECTION = "select 1"
 class NewServerView : Fragment("Create new connection") {
     override val root = Form()
 
-    private val databaseConnection = DatabaseConnectionInfo("", "")
+    private val databaseConnection: DatabaseConnectionInfo by inject()
 
     val labelText = SimpleStringProperty()
     val testConnectionLabel = label(labelText)
@@ -22,6 +22,10 @@ class NewServerView : Fragment("Create new connection") {
 
         with(root) {
             fieldset("Connection Information") {
+                field("Connection Name") {
+                    textfield().bind(databaseConnection.connectionNameProperty())
+                }
+
                 field("Host") {
                     textfield().bind(databaseConnection.hostProperty())
                 }
@@ -67,7 +71,8 @@ class NewServerView : Fragment("Create new connection") {
                             }
                         }
 
-                        disableProperty().bind(databaseConnection.usernameProperty().isNull.or(databaseConnection.passwordProperty().isNull))
+                        disableProperty().bind(databaseConnection.usernameProperty().isNull.or(databaseConnection.hostProperty().isNull
+                                .or(databaseConnection.portProperty().isNull.or(databaseConnection.connectionNameProperty().isNull))))
                     }
                     button("Test connection") {
                         action {
