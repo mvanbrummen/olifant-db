@@ -92,7 +92,7 @@ class MainView : View("OlifantDB") {
             tabpane {
                 tab("Query 1") {
                     textarea(input) {
-                        font = Font.font("Monospaced")
+                        font = Font.font("Monospaced", 14.0)
                     }
                 }
             }
