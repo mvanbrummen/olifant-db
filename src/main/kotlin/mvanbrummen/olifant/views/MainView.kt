@@ -16,12 +16,13 @@ class MainView : View("OlifantDB") {
 
     val dbController: DatabaseController by inject()
 
+    val dbTreeView = find(DatabaseTreeView::class)
+
     val input = SimpleStringProperty()
     val data = FXCollections.observableArrayList<List<String>>()
     val tableview = tableview(data)
 
     override val root = borderpane {
-
         setPrefSize(WIDTH, HEIGHT)
 
         top = vbox {
@@ -82,6 +83,8 @@ class MainView : View("OlifantDB") {
                     }
                 }
             }
+
+            this += dbTreeView.root
         }
 
         center = vbox {
@@ -90,9 +93,13 @@ class MainView : View("OlifantDB") {
                     textarea(input)
                 }
             }
-            tableview
+            this += tableview
         }
+
     }
 
+
 }
+
+
 
