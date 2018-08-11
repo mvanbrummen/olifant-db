@@ -5,6 +5,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.application.Platform
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
+import javafx.scene.text.Font
 import mvanbrummen.olifant.controllers.DatabaseController
 import tornadofx.*
 import java.lang.System.exit
@@ -90,7 +91,9 @@ class MainView : View("OlifantDB") {
         center = vbox {
             tabpane {
                 tab("Query 1") {
-                    textarea(input)
+                    textarea(input) {
+                        font = Font.font("Monospaced")
+                    }
                 }
             }
             this += tableview
