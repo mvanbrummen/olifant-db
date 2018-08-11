@@ -44,55 +44,57 @@ class NewServerView : Fragment("Create new connection") {
 
             }
 
-            hbox {
-                button("Connect") {
-                    action {
-                        val ds = getDataSource()
+            vbox {
+                hbox {
+                    button("Connect") {
+                        action {
+                            val ds = getDataSource()
 
-                        try {
-                            val conn = ds.connection
-                            conn.createStatement().executeQuery(TEST_CONNECTION)
-                            conn.close()
+                            try {
+                                val conn = ds.connection
+                                conn.createStatement().executeQuery(TEST_CONNECTION)
+                                conn.close()
 
-                            DatabaseConnection.add(ds)
+                                DatabaseConnection.add(ds)
 
-                            closeModal()
-                        } catch (e: Exception) {
-                            with(testConnectionLabel) {
-                                removeClass(Styles.successText)
-                                addClass(Styles.errorText)
+                                closeModal()
+                            } catch (e: Exception) {
+                                with(testConnectionLabel) {
+                                    removeClass(Styles.successText)
+                                    addClass(Styles.errorText)
+                                }
+                                labelText.value = "Failed to connect"
                             }
-                            labelText.value = "Failed to connect"
+                        }
+
+                        disableProperty().bind(databaseConnection.usernameProperty().isNull.or(databaseConnection.passwordProperty().isNull))
+                    }
+                    button("Test connection") {
+                        action {
+                            val ds = getDataSource()
+
+                            labelText.value = try {
+                                val conn = ds.connection
+                                conn.createStatement().executeQuery(TEST_CONNECTION)
+                                conn.close()
+
+                                with(testConnectionLabel) {
+                                    removeClass(Styles.errorText)
+                                    addClass(Styles.successText)
+                                }
+
+                                "Successfully connected!"
+                            } catch (e: Exception) {
+                                with(testConnectionLabel) {
+                                    removeClass(Styles.successText)
+                                    addClass(Styles.errorText)
+                                }
+                                "Failed to connect: ${e.message}"
+                            }
                         }
                     }
-
-                    disableProperty().bind(databaseConnection.usernameProperty().isNull.or(databaseConnection.passwordProperty().isNull))
                 }
-                button("Test connection") {
-                    action {
-                        val ds = getDataSource()
-
-                        labelText.value = try {
-                            val conn = ds.connection
-                            conn.createStatement().executeQuery(TEST_CONNECTION)
-                            conn.close()
-
-                            with(testConnectionLabel) {
-                                removeClass(Styles.errorText)
-                                addClass(Styles.successText)
-                            }
-
-                            "Successfully connected!"
-                        } catch (e: Exception) {
-                            with(testConnectionLabel) {
-                                removeClass(Styles.successText)
-                                addClass(Styles.errorText)
-                            }
-                            "Failed to connect: ${e.message}"
-                        }
-                    }
-                }
-                testConnectionLabel
+                this += testConnectionLabel
             }
         }
     }
