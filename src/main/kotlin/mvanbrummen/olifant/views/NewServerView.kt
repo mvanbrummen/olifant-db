@@ -64,7 +64,7 @@ class NewServerView : Fragment("Create new connection") {
 
                                 DatabaseConnection.add(ds)
 
-                                databaseTreeContext.addDatabaseTreeItem(databaseConnection.connectionName, ds)
+                                databaseTreeContext.addDatabaseConnectionTreeItem(databaseConnection.connectionName)
 
                                 closeModal()
                             } catch (e: Exception) {

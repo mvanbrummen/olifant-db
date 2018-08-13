@@ -75,4 +75,44 @@ class DatabaseController : Controller() {
 
         return databases
     }
+
+    fun getSchemas(databaseName: String, ds: DataSource): List<String> {
+        val queryString = "SELECT schema_name FROM information_schema.schemata;"
+
+        val conn = ds.connection
+        val statement = conn.prepareStatement(queryString)
+        val rs = statement.executeQuery()
+
+        val schemas = mutableListOf<String>()
+
+        while (rs.next()) {
+            val result = rs.getString("schema_name")
+
+            if (result != null) {
+                schemas.add(result)
+            }
+        }
+
+        return schemas
+    }
+
+    fun getTables(schemaName: String, ds: DataSource): List<String> {
+        val queryString = "SELECT table_name FROM information_schema.tables WHERE table_schema = '$schemaName'"
+
+        val conn = ds.connection
+        val statement = conn.prepareStatement(queryString)
+        val rs = statement.executeQuery()
+
+        val tables = mutableListOf<String>()
+
+        while (rs.next()) {
+            val result = rs.getString("table_name")
+
+            if (result != null) {
+                tables.add(result)
+            }
+        }
+
+        return tables
+    }
 }
