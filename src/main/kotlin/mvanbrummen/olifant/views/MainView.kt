@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.scene.text.Font
 import mvanbrummen.olifant.controllers.DatabaseController
+import mvanbrummen.olifant.controllers.DatabaseTreeContext
 import tornadofx.*
 import java.lang.System.exit
 
@@ -18,6 +19,8 @@ class MainView : View("OlifantDB") {
     val dbController: DatabaseController by inject()
 
     val dbTreeView = find(DatabaseTreeView::class)
+
+    val dbTreeContext = find(DatabaseTreeContext::class)
 
     val input = SimpleStringProperty()
     val data = FXCollections.observableArrayList<List<String>>()
@@ -56,6 +59,10 @@ class MainView : View("OlifantDB") {
                 button("", FontAwesomeIconView(FontAwesomeIcon.REFRESH)) {
                     action {
                         println("Refreshing tree...")
+
+
+                        // TODO make it render correctly
+                        dbTreeContext.clear()
                     }
                 }
             }

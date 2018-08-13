@@ -18,6 +18,12 @@ class DatabaseTreeContext : Controller() {
     val schemas = FXCollections.observableArrayList<Schema>()
     val tables = FXCollections.observableArrayList<Table>()
 
+    fun clear() {
+        databases.clear()
+        schemas.clear()
+        tables.clear()
+    }
+
     fun addDatabaseConnectionTreeItem(connectionName: String) {
         databaseConnections.setAll(DatabaseConnection(connectionName))
     }
