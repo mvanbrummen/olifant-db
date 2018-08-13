@@ -43,32 +43,7 @@ class MainView : View("OlifantDB") {
                 }
             }
 
-            toolbar {
-                button("Execute", FontAwesomeIconView(FontAwesomeIcon.PLAY)) {
 
-                    action {
-                        if (input.value.isNotBlank()) {
-                            runAsync {
-                                dbController.executeQuery(input.value)
-                            } ui { entries ->
-
-                                entries.first().forEachIndexed { colIndex, name ->
-                                    tableview.column(name, String::class) {
-                                        value { row ->
-                                            SimpleStringProperty(row.value[colIndex])
-                                        }
-                                    }
-                                }
-
-                                data.setAll(entries.drop(1))
-                            }
-                        }
-                    }
-                }
-                button("Stop", FontAwesomeIconView(FontAwesomeIcon.STOP)) {
-                    println("stopping query...")
-                }
-            }
         }
 
         left = vbox {
@@ -91,8 +66,42 @@ class MainView : View("OlifantDB") {
         center = vbox {
             tabpane {
                 tab("Query 1") {
-                    textarea(input) {
-                        font = Font.font("Monospaced", 14.0)
+                    vbox {
+                        toolbar {
+                            button("Execute", FontAwesomeIconView(FontAwesomeIcon.PLAY)) {
+
+                                action {
+                                    if (input.value.isNotBlank()) {
+                                        runAsync {
+                                            dbController.executeQuery(input.value)
+                                        } ui { entries ->
+
+                                            entries.first().forEachIndexed { colIndex, name ->
+                                                tableview.column(name, String::class) {
+                                                    value { row ->
+                                                        SimpleStringProperty(row.value[colIndex])
+                                                    }
+                                                }
+                                            }
+
+                                            data.setAll(entries.drop(1))
+                                        }
+                                    }
+                                }
+                            }
+                            button("", FontAwesomeIconView(FontAwesomeIcon.STOP)) {
+                                println("stopping query...")
+                            }
+                            separator {}
+                            button("", FontAwesomeIconView(FontAwesomeIcon.COPY))
+                            button("", FontAwesomeIconView(FontAwesomeIcon.PASTE))
+                            separator {}
+                            button("", FontAwesomeIconView(FontAwesomeIcon.SAVE))
+                            button("", FontAwesomeIconView(FontAwesomeIcon.FILE))
+                        }
+                        textarea(input) {
+                            font = Font.font("Monospaced", 14.0)
+                        }
                     }
                 }
             }
