@@ -33,7 +33,7 @@ class DatabaseTreeView : View() {
                     populate { parent ->
                         val value = parent.value
                         when (value) {
-                            TreeRoot -> dbConnections.map { it }
+                            TreeRoot -> dbConnections
                             is DatabaseConnection -> value.databases
                             is Database -> value.schemas
                             is Schema -> emptyList()
