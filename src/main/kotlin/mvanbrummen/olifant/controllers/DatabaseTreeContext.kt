@@ -16,6 +16,13 @@ class DatabaseTreeContext : Controller() {
     val tables = FXCollections.observableArrayList<Table>()
     val roles = FXCollections.observableArrayList<Role>()
 
+    init {
+        val connectionName = app.config.string("connectionName")
+        if (connectionName !== null) {
+            databaseConnections.setAll(FXCollections.observableArrayList(DatabaseConnection(connectionName)))
+        }
+    }
+
     fun clear() {
         databases.clear()
         schemas.clear()

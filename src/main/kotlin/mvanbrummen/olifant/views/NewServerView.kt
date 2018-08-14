@@ -66,8 +66,24 @@ class NewServerView : Fragment("Create new connection") {
 
                                 databaseTreeContext.addDatabaseConnectionTreeItem(databaseConnection.connectionName)
 
+                                with(app.config) {
+                                    set("connectionName" to databaseConnection.connectionName)
+                                    set("host" to databaseConnection.host)
+                                    set("port" to databaseConnection.port)
+                                    set("username" to databaseConnection.username)
+
+                                    if (databaseConnection.password !== null) {
+                                        set("password" to databaseConnection.password)
+                                    }
+
+                                    set("databaseName" to databaseConnection.databaseName)
+                                    save()
+                                }
+
                                 closeModal()
                             } catch (e: Exception) {
+                                log.info(e.message)
+
                                 with(testConnectionLabel) {
                                     removeClass(Styles.successText)
                                     addClass(Styles.errorText)

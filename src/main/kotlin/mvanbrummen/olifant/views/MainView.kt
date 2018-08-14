@@ -8,6 +8,8 @@ import javafx.collections.FXCollections
 import javafx.scene.text.Font
 import mvanbrummen.olifant.controllers.DatabaseController
 import mvanbrummen.olifant.controllers.DatabaseTreeContext
+import mvanbrummen.olifant.db.DatabaseConnection
+import org.postgresql.ds.PGSimpleDataSource
 import tornadofx.*
 import java.lang.System.exit
 
@@ -25,6 +27,24 @@ class MainView : View("OlifantDB") {
     val input = SimpleStringProperty()
     val data = FXCollections.observableArrayList<List<String>>()
     val tableview = tableview(data)
+
+    init {
+        if (app.config.string("connectionName") !== null) {
+            val host = app.config.string("host")
+            val port = app.config.int("port")
+            val username = app.config.string("username")
+            val pword = if (app.config.string("password") == null) "" else app.config.string("password")
+            val databaseName = app.config.string("databaseName")
+
+            DatabaseConnection.add(
+                    PGSimpleDataSource().apply {
+                        url = "jdbc:postgresql://$host:$port/$databaseName"
+                        user = username
+                        password = pword
+                    }
+            )
+        }
+    }
 
     override val root = borderpane {
         setPrefSize(WIDTH, HEIGHT)

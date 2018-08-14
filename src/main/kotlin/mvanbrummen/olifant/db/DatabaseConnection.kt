@@ -2,11 +2,14 @@ package mvanbrummen.olifant.db
 
 import javax.sql.DataSource
 
-object DatabaseConnection {
-    private val dataSources = mutableListOf<DataSource>()
+class DatabaseConnection {
+    companion object {
 
-    fun add(ds: DataSource) = dataSources.add(ds)
+        private val dataSources = mutableListOf<DataSource>()
 
-    fun getDataSource(): DataSource = dataSources.first()
+        fun add(ds: DataSource) = dataSources.add(ds)
+
+        fun getDataSource(): DataSource = dataSources.first()
+    }
 
 }
