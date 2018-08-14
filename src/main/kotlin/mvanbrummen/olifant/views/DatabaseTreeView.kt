@@ -23,11 +23,13 @@ class DatabaseTreeView : View() {
                         text = it.name
 
                         graphic = when (it) {
-                            is DatabaseConnection -> FontAwesomeIconView(FontAwesomeIcon.DATABASE)
+                            is DatabaseConnection -> FontAwesomeIconView(FontAwesomeIcon.SERVER)
                             is Database -> FontAwesomeIconView(FontAwesomeIcon.DATABASE)
                             is Schema -> FontAwesomeIconView(FontAwesomeIcon.TABLE)
                             is Table -> FontAwesomeIconView(FontAwesomeIcon.TABLE)
-                            else -> kotlin.error("Invalid value type")
+                            TreeRoot -> FontAwesomeIconView(FontAwesomeIcon.DATABASE)
+                            is DatabaseRoot -> FontAwesomeIconView(FontAwesomeIcon.DATABASE)
+                            is RolesRoot -> FontAwesomeIconView(FontAwesomeIcon.USER)
                         }
 
                         onMouseClicked = when (it) {
@@ -53,16 +55,21 @@ class DatabaseTreeView : View() {
                             is Table -> EventHandler { mouseEvent ->
                                 println("Table clicked: " + it.name)
                             }
+                            else -> EventHandler {
+
+                            }
                         }
                     }
                     populate { parent ->
                         val value = parent.value
                         when (value) {
                             TreeRoot -> dbTreeContext.databaseConnections
-                            is DatabaseConnection -> dbTreeContext.databases.filter { it.databaseConnectionName == value.name }
+                            is DatabaseConnection -> listOf(DatabaseRoot(value.name), RolesRoot(value.name))
                             is Database -> dbTreeContext.schemas.filter { it.databaseName == value.name }
                             is Schema -> dbTreeContext.tables.filter { it.schemaName == value.name }
                             is Table -> emptyList()
+                            is DatabaseRoot -> dbTreeContext.databases.filter { it.databaseConnectionName == value.databaseConnectionName }
+                            is RolesRoot -> emptyList()
                         }
                     }
                 }
