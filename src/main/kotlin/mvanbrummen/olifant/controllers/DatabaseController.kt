@@ -80,6 +80,9 @@ class DatabaseController : Controller() {
         val queryString = "SELECT schema_name FROM information_schema.schemata;"
 
         val conn = ds.connection
+
+        conn.catalog = databaseName
+
         val statement = conn.prepareStatement(queryString)
         val rs = statement.executeQuery()
 

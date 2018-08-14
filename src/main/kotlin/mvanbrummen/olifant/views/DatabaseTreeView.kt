@@ -23,8 +23,8 @@ class DatabaseTreeView : View() {
                         text = it.name
 
                         graphic = when (it) {
-                            is DatabaseConnection -> FontAwesomeIconView(FontAwesomeIcon.SERVER)
-                            is Database -> FontAwesomeIconView(FontAwesomeIcon.FOLDER)
+                            is DatabaseConnection -> FontAwesomeIconView(FontAwesomeIcon.DATABASE)
+                            is Database -> FontAwesomeIconView(FontAwesomeIcon.DATABASE)
                             is Schema -> FontAwesomeIconView(FontAwesomeIcon.TABLE)
                             is Table -> FontAwesomeIconView(FontAwesomeIcon.TABLE)
                             else -> kotlin.error("Invalid value type")
