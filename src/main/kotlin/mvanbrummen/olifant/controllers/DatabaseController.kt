@@ -118,4 +118,24 @@ class DatabaseController : Controller() {
 
         return tables
     }
+
+    fun getRoles(ds: DataSource): List<String> {
+        val queryString = "SELECT rolname FROM pg_roles;"
+
+        val conn = ds.connection
+        val statement = conn.prepareStatement(queryString)
+        val rs = statement.executeQuery()
+
+        val roles = mutableListOf<String>()
+
+        while (rs.next()) {
+            val result = rs.getString("rolname")
+
+            if (result != null) {
+                roles.add(result)
+            }
+        }
+
+        return roles
+    }
 }

@@ -30,6 +30,7 @@ class DatabaseTreeView : View() {
                             TreeRoot -> FontAwesomeIconView(FontAwesomeIcon.DATABASE)
                             is DatabaseRoot -> FontAwesomeIconView(FontAwesomeIcon.DATABASE)
                             is RolesRoot -> FontAwesomeIconView(FontAwesomeIcon.USER)
+                            is Role -> FontAwesomeIconView(FontAwesomeIcon.USER)
                         }
 
                         onMouseClicked = when (it) {
@@ -38,9 +39,7 @@ class DatabaseTreeView : View() {
                             }
                             is DatabaseConnection -> EventHandler { mouseEvent ->
                                 println("DB connection clicked: " + it.name)
-                                
-                                // TODO shouldnt be called after already fetched from DB
-                                dbTreeContext.addDatabaseTreeItem(it.name, mvanbrummen.olifant.db.DatabaseConnection.getDataSource())
+
                             }
                             is Database -> EventHandler { mouseEvent ->
                                 println("DB clicked: " + it.name)
@@ -54,6 +53,16 @@ class DatabaseTreeView : View() {
                             }
                             is Table -> EventHandler { mouseEvent ->
                                 println("Table clicked: " + it.name)
+                            }
+                            is RolesRoot -> EventHandler { mouseEvent ->
+                                println("Role clicked: " + it.name)
+
+                                dbTreeContext.addRoleTreeItem(it.databaseConnectionName, mvanbrummen.olifant.db.DatabaseConnection.getDataSource())
+                            }
+                            is DatabaseRoot -> EventHandler { mouseEvent ->
+                                println("DB Root clicked: " + it.name)
+
+                                dbTreeContext.addDatabaseTreeItem(it.name, mvanbrummen.olifant.db.DatabaseConnection.getDataSource())
                             }
                             else -> EventHandler {
 
@@ -69,7 +78,8 @@ class DatabaseTreeView : View() {
                             is Schema -> dbTreeContext.tables.filter { it.schemaName == value.name }
                             is Table -> emptyList()
                             is DatabaseRoot -> dbTreeContext.databases.filter { it.databaseConnectionName == value.databaseConnectionName }
-                            is RolesRoot -> emptyList()
+                            is RolesRoot -> dbTreeContext.roles.filter { it.databaseConnectionName == value.databaseConnectionName }
+                            is Role -> emptyList()
                         }
                     }
                 }

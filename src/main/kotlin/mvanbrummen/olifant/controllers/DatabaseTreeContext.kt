@@ -1,10 +1,7 @@
 package mvanbrummen.olifant.controllers
 
 import javafx.collections.FXCollections
-import mvanbrummen.olifant.models.Database
-import mvanbrummen.olifant.models.DatabaseConnection
-import mvanbrummen.olifant.models.Schema
-import mvanbrummen.olifant.models.Table
+import mvanbrummen.olifant.models.*
 import tornadofx.Controller
 import javax.sql.DataSource
 
@@ -17,11 +14,13 @@ class DatabaseTreeContext : Controller() {
     val databases = FXCollections.observableArrayList<Database>()
     val schemas = FXCollections.observableArrayList<Schema>()
     val tables = FXCollections.observableArrayList<Table>()
+    val roles = FXCollections.observableArrayList<Role>()
 
     fun clear() {
         databases.clear()
         schemas.clear()
         tables.clear()
+        roles.clear()
     }
 
     fun addDatabaseConnectionTreeItem(connectionName: String) {
@@ -36,7 +35,7 @@ class DatabaseTreeContext : Controller() {
         } ui {
             addDatabaseConnectionTreeItem(connectionName) // TODO remove
             databases.setAll(FXCollections.observableArrayList(
-                    it.map { Database(it, connectionName) }.toSet())
+                    it.map { Database(it, connectionName) })
             )
         }
     }
@@ -46,7 +45,7 @@ class DatabaseTreeContext : Controller() {
             databaseController.getSchemas(databaseName, ds)
         } ui {
             schemas.setAll(FXCollections.observableArrayList(
-                    it.map { Schema(it, databaseName) }.toSet())
+                    it.map { Schema(it, databaseName) })
             )
         }
 
@@ -57,9 +56,21 @@ class DatabaseTreeContext : Controller() {
             databaseController.getTables(schemaName, ds)
         } ui {
             tables.setAll(FXCollections.observableArrayList(
-                    it.map { Table(it, schemaName) }.toSet())
+                    it.map { Table(it, schemaName) })
             )
         }
 
     }
+
+    fun addRoleTreeItem(connectionName: String, ds: DataSource) {
+        runAsync {
+            databaseController.getRoles(ds)
+        } ui {
+            roles.setAll(FXCollections.observableArrayList(
+                    it.map { Role(it, connectionName) })
+            )
+        }
+
+    }
+
 }
