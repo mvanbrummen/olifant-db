@@ -14,6 +14,7 @@ class Styles : Stylesheet() {
         val heading by cssclass()
         val errorText by cssclass()
         val successText by cssclass()
+        val keyword by cssclass()
     }
 
     init {
@@ -37,6 +38,10 @@ class Styles : Stylesheet() {
         }
         successText {
             textFill = Color.GREEN
+        }
+        keyword {
+            fill = Color.MAROON
+            fontWeight = FontWeight.BOLD
         }
     }
 }

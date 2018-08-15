@@ -5,14 +5,17 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.application.Platform
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
+import mvanbrummen.olifant.Styles
 import mvanbrummen.olifant.config.ConfigHelper
 import mvanbrummen.olifant.controllers.DatabaseController
 import mvanbrummen.olifant.controllers.DatabaseTreeContext
+import mvanbrummen.olifant.controllers.PGSyntaxController
 import mvanbrummen.olifant.db.DatabaseConnection
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
 import tornadofx.*
 import java.lang.System.exit
+import java.time.Duration
 
 const val HEIGHT = 600.0
 const val WIDTH = 950.0
@@ -20,6 +23,7 @@ const val WIDTH = 950.0
 class MainView : View("OlifantDB") {
 
     val dbController: DatabaseController by inject()
+    val syntaxController: PGSyntaxController by inject()
 
     val dbTreeView = find(DatabaseTreeView::class)
     val connectionBar = find(ConnectionBar::class)
@@ -121,13 +125,19 @@ class MainView : View("OlifantDB") {
                         }
                         this += connectionBar
 
-                        codeArea.richChanges().subscribe { change ->
+                        val subscribe = codeArea
+                                .multiPlainChanges()
+                                .successionEnds(Duration.ofMillis(500))
+                                .subscribe { change ->
+                                    codeArea.setStyleClass(0, codeArea.length, Styles.keyword.name)
+                                    codeArea.setStyleSpans(0, syntaxController.computeHighlighting(codeArea.text))
+                                }
 
-
-                        }
                         codeArea.paragraphGraphicFactory = LineNumberFactory.get(codeArea)
 
                         this += codeArea
+
+                        // subscribe.unsubscribe() TODO
                     }
                 }
             }
