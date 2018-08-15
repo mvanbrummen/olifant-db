@@ -2,6 +2,7 @@ package mvanbrummen.olifant.views
 
 import javafx.beans.property.SimpleStringProperty
 import mvanbrummen.olifant.Styles
+import mvanbrummen.olifant.config.ConfigHelper
 import mvanbrummen.olifant.controllers.DatabaseTreeContext
 import mvanbrummen.olifant.db.DatabaseConnection
 import mvanbrummen.olifant.models.DatabaseConnectionInfo
@@ -66,19 +67,7 @@ class NewServerView : Fragment("Create new connection") {
 
                                 databaseTreeContext.addDatabaseConnectionTreeItem(databaseConnection.connectionName)
 
-                                with(app.config) {
-                                    set("connectionName" to databaseConnection.connectionName)
-                                    set("host" to databaseConnection.host)
-                                    set("port" to databaseConnection.port)
-                                    set("username" to databaseConnection.username)
-
-                                    if (databaseConnection.password !== null) {
-                                        set("password" to databaseConnection.password)
-                                    }
-
-                                    set("databaseName" to databaseConnection.databaseName)
-                                    save()
-                                }
+                                ConfigHelper.saveConnection(app.config, databaseConnection)
 
                                 closeModal()
                             } catch (e: Exception) {

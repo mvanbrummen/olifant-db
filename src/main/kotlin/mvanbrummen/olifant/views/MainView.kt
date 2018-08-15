@@ -5,12 +5,11 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.application.Platform
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
-import javafx.scene.paint.Paint
 import javafx.scene.text.Font
+import mvanbrummen.olifant.config.ConfigHelper
 import mvanbrummen.olifant.controllers.DatabaseController
 import mvanbrummen.olifant.controllers.DatabaseTreeContext
 import mvanbrummen.olifant.db.DatabaseConnection
-import org.postgresql.ds.PGSimpleDataSource
 import tornadofx.*
 import java.lang.System.exit
 
@@ -22,6 +21,7 @@ class MainView : View("OlifantDB") {
     val dbController: DatabaseController by inject()
 
     val dbTreeView = find(DatabaseTreeView::class)
+    val connectionBar = find(ConnectionBar::class)
 
     val dbTreeContext = find(DatabaseTreeContext::class)
 
@@ -30,20 +30,8 @@ class MainView : View("OlifantDB") {
     val tableview = tableview(data)
 
     init {
-        if (app.config.string("connectionName") !== null) {
-            val host = app.config.string("host")
-            val port = app.config.int("port")
-            val username = app.config.string("username")
-            val pword = if (app.config.string("password") == null) "" else app.config.string("password")
-            val databaseName = app.config.string("databaseName")
-
-            DatabaseConnection.add(
-                    PGSimpleDataSource().apply {
-                        url = "jdbc:postgresql://$host:$port/$databaseName"
-                        user = username
-                        password = pword
-                    }
-            )
+        if (ConfigHelper.isConnectionSaved(app.config)) {
+            DatabaseConnection.add(ConfigHelper.getSavedConnectionDataSource(app.config))
         }
     }
 
@@ -127,18 +115,7 @@ class MainView : View("OlifantDB") {
                             button("", FontAwesomeIconView(FontAwesomeIcon.SAVE))
                             button("", FontAwesomeIconView(FontAwesomeIcon.FILE))
                         }
-                        hbox {
-                            label("kgitforge on postgres@localhost") {
-                                style {
-                                    textFill = Paint.valueOf("#FFF")
-                                    paddingLeft = 5
-                                }
-                            }
-
-                            style {
-                                backgroundColor += Paint.valueOf("#41b2f4")
-                            }
-                        }
+                        this += connectionBar
                         textarea(input) {
                             font = Font.font("Monospaced", 14.0)
                         }

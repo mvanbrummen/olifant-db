@@ -1,6 +1,7 @@
 package mvanbrummen.olifant.controllers
 
 import javafx.collections.FXCollections
+import mvanbrummen.olifant.config.ConfigHelper
 import mvanbrummen.olifant.models.*
 import tornadofx.Controller
 import javax.sql.DataSource
@@ -17,9 +18,10 @@ class DatabaseTreeContext : Controller() {
     val roles = FXCollections.observableArrayList<Role>()
 
     init {
-        val connectionName = app.config.string("connectionName")
-        if (connectionName !== null) {
-            databaseConnections.setAll(FXCollections.observableArrayList(DatabaseConnection(connectionName)))
+        if (ConfigHelper.isConnectionSaved(app.config)) {
+            databaseConnections.setAll(FXCollections.observableArrayList(
+                    DatabaseConnection(ConfigHelper.getSavedConnectionName(app.config)))
+            )
         }
     }
 
