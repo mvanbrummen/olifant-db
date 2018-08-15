@@ -13,3 +13,8 @@ class DatabaseRoot(val databaseConnectionName: String) : DatabaseTreeItem("Datab
 class RolesRoot(val databaseConnectionName: String) : DatabaseTreeItem("Roles")
 
 class SchemaRoot(val databaseName: String): DatabaseTreeItem("Schemas")
+
+class TableRoot(val schemaName: String): DatabaseTreeItem("Tables")
+class ViewRoot(val schemaName: String): DatabaseTreeItem("Views")
+class SequenceRoot(val schemaName: String): DatabaseTreeItem("Sequences")
+class FunctionRoot(val schemaName: String): DatabaseTreeItem("Functions")
