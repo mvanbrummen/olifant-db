@@ -5,6 +5,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.application.Platform
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
+import javafx.scene.paint.Paint
 import javafx.scene.text.Font
 import mvanbrummen.olifant.controllers.DatabaseController
 import mvanbrummen.olifant.controllers.DatabaseTreeContext
@@ -125,6 +126,18 @@ class MainView : View("OlifantDB") {
                             separator {}
                             button("", FontAwesomeIconView(FontAwesomeIcon.SAVE))
                             button("", FontAwesomeIconView(FontAwesomeIcon.FILE))
+                        }
+                        hbox {
+                            label("kgitforge on postgres@localhost") {
+                                style {
+                                    textFill = Paint.valueOf("#FFF")
+                                    paddingLeft = 5
+                                }
+                            }
+
+                            style {
+                                backgroundColor += Paint.valueOf("#41b2f4")
+                            }
                         }
                         textarea(input) {
                             font = Font.font("Monospaced", 14.0)
