@@ -5,11 +5,12 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.application.Platform
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
-import javafx.scene.text.Font
 import mvanbrummen.olifant.config.ConfigHelper
 import mvanbrummen.olifant.controllers.DatabaseController
 import mvanbrummen.olifant.controllers.DatabaseTreeContext
 import mvanbrummen.olifant.db.DatabaseConnection
+import org.fxmisc.richtext.CodeArea
+import org.fxmisc.richtext.LineNumberFactory
 import tornadofx.*
 import java.lang.System.exit
 
@@ -25,9 +26,10 @@ class MainView : View("OlifantDB") {
 
     val dbTreeContext = find(DatabaseTreeContext::class)
 
-    val input = SimpleStringProperty()
     val data = FXCollections.observableArrayList<List<String>>()
     val tableview = tableview(data)
+
+    val codeArea = CodeArea()
 
     init {
         if (ConfigHelper.isConnectionSaved(app.config)) {
@@ -89,9 +91,9 @@ class MainView : View("OlifantDB") {
                                 shortcut("F5")
 
                                 action {
-                                    if (input.value.isNotBlank()) {
+                                    if (codeArea.text.isNotBlank()) {
                                         runAsync {
-                                            dbController.executeQuery(input.value)
+                                            dbController.executeQuery(codeArea.text)
                                         } ui { entries ->
 
                                             entries.first().forEachIndexed { colIndex, name ->
@@ -118,9 +120,14 @@ class MainView : View("OlifantDB") {
                             button("", FontAwesomeIconView(FontAwesomeIcon.FILE))
                         }
                         this += connectionBar
-                        textarea(input) {
-                            font = Font.font("Monospaced", 14.0)
+
+                        codeArea.richChanges().subscribe { change ->
+
+
                         }
+                        codeArea.paragraphGraphicFactory = LineNumberFactory.get(codeArea)
+
+                        this += codeArea
                     }
                 }
             }
