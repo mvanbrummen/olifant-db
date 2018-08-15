@@ -86,6 +86,8 @@ class MainView : View("OlifantDB") {
                         toolbar {
                             button("Execute", FontAwesomeIconView(FontAwesomeIcon.PLAY)) {
 
+                                shortcut("F5")
+
                                 action {
                                     if (input.value.isNotBlank()) {
                                         runAsync {
