@@ -10,6 +10,7 @@ import mvanbrummen.olifant.config.ConfigHelper
 import mvanbrummen.olifant.controllers.DatabaseController
 import mvanbrummen.olifant.controllers.DatabaseTreeContext
 import mvanbrummen.olifant.controllers.PGSyntaxController
+import mvanbrummen.olifant.controllers.QueryParserController
 import mvanbrummen.olifant.db.DatabaseConnection
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
@@ -24,6 +25,7 @@ class MainView : View("OlifantDB") {
 
     val dbController: DatabaseController by inject()
     val syntaxController: PGSyntaxController by inject()
+    val queryParserController: QueryParserController by inject()
 
     val dbTreeView = find(DatabaseTreeView::class)
     val connectionBar = find(ConnectionBar::class)
@@ -95,12 +97,18 @@ class MainView : View("OlifantDB") {
                                 shortcut("F5")
 
                                 action {
-                                    if (codeArea.text.isNotBlank()) {
+                                    val codeAreaText = codeArea.text
+
+                                    if (codeAreaText.isNotBlank()) {
                                         runAsync {
-                                            dbController.executeQuery(codeArea.text)
+                                            val statements = queryParserController.parseQuery(codeAreaText)
+
+                                            dbController.executeStatements(statements)
                                         } ui { entries ->
 
-                                            entries.first().forEachIndexed { colIndex, name ->
+                                            // TODO handle collection of results
+
+                                            entries.first().columns.first().forEachIndexed { colIndex, name ->
                                                 tableview.column(name, String::class) {
                                                     value { row ->
                                                         SimpleStringProperty(row.value[colIndex])
@@ -108,7 +116,7 @@ class MainView : View("OlifantDB") {
                                                 }
                                             }
 
-                                            data.setAll(entries.drop(1))
+                                            data.setAll(entries.drop(1).flatMap { it.columns })
                                         }
                                     }
                                 }
