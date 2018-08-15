@@ -15,7 +15,7 @@ class QueryParserController : Controller() {
         return statements
                 .filter { s -> s.isNotEmpty() }
                 .map { statement ->
-                    if (statement.startsWith("select")) {
+                    if (statement.startsWith("select", true)) {
                         QueryStatement(statement)
                     } else {
                         UpdateStatement(statement)

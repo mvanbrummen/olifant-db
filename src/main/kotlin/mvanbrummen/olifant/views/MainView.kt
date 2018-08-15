@@ -116,7 +116,7 @@ class MainView : View("OlifantDB") {
                                                 }
                                             }
 
-                                            data.setAll(entries.drop(1).flatMap { it.columns })
+                                            data.setAll(entries.first().columns.drop(1))
                                         }
                                     }
                                 }
