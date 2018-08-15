@@ -11,3 +11,5 @@ data class Role(override val name: String, val databaseConnectionName: String) :
 
 class DatabaseRoot(val databaseConnectionName: String) : DatabaseTreeItem("Databases")
 class RolesRoot(val databaseConnectionName: String) : DatabaseTreeItem("Roles")
+
+class SchemaRoot(val databaseName: String): DatabaseTreeItem("Schemas")

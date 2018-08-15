@@ -31,6 +31,7 @@ class DatabaseTreeView : View() {
                             is DatabaseRoot -> FontAwesomeIconView(FontAwesomeIcon.DATABASE)
                             is RolesRoot -> FontAwesomeIconView(FontAwesomeIcon.USER)
                             is Role -> FontAwesomeIconView(FontAwesomeIcon.USER)
+                            is SchemaRoot -> FontAwesomeIconView(FontAwesomeIcon.TABLE)
                         }
 
                         onMouseClicked = when (it) {
@@ -44,7 +45,7 @@ class DatabaseTreeView : View() {
                             is Database -> EventHandler { mouseEvent ->
                                 println("DB clicked: " + it.name)
 
-                                dbTreeContext.addSchemaTreeItem(it.name, mvanbrummen.olifant.db.DatabaseConnection.getDataSource())
+
                             }
                             is Schema -> EventHandler { mouseEvent ->
                                 println("Schema clicked: " + it.name)
@@ -64,6 +65,11 @@ class DatabaseTreeView : View() {
 
                                 dbTreeContext.addDatabaseTreeItem(it.name, mvanbrummen.olifant.db.DatabaseConnection.getDataSource())
                             }
+                            is SchemaRoot -> EventHandler { mouseEvent ->
+                                println("Schema Root clicked: " + it.name)
+
+                                dbTreeContext.addSchemaTreeItem(it.databaseName, mvanbrummen.olifant.db.DatabaseConnection.getDataSource())
+                            }
                             else -> EventHandler {
 
                             }
@@ -74,7 +80,8 @@ class DatabaseTreeView : View() {
                         when (value) {
                             TreeRoot -> dbTreeContext.databaseConnections
                             is DatabaseConnection -> listOf(DatabaseRoot(value.name), RolesRoot(value.name))
-                            is Database -> dbTreeContext.schemas.filter { it.databaseName == value.name }
+                            is Database -> listOf(SchemaRoot(value.name))
+                            is SchemaRoot -> dbTreeContext.schemas.filter { it.databaseName == value.databaseName }
                             is Schema -> dbTreeContext.tables.filter { it.schemaName == value.name }
                             is Table -> emptyList()
                             is DatabaseRoot -> dbTreeContext.databases.filter { it.databaseConnectionName == value.databaseConnectionName }
