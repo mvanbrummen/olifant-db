@@ -12,7 +12,11 @@ import javax.sql.DataSource
 
 typealias Columns = List<List<String>>
 
+class DBException(override val message: String) : RuntimeException(message)
+
 class DatabaseController : Controller() {
+
+    val FALLBACK_ERROR_MESSAGE = "Error running query"
 
     data class DatabaseResult(val columns: Columns, val rowsAffected: Int)
 
@@ -26,48 +30,56 @@ class DatabaseController : Controller() {
     }
 
     private fun executeQuery(queryString: String): DatabaseResult {
-        val conn = DatabaseConnection.getDataSource().connection
-        val statement = conn.prepareStatement(queryString)
-        val rs = statement.executeQuery()
+        var conn: Connection? = null
 
-        val rows = mutableListOf<List<String>>()
-        val metaData = rs.metaData
-        val columnCount = metaData.columnCount
+        try {
+            conn = DatabaseConnection.getDataSource().connection
 
-        val columns = mutableListOf<String>()
+            val statement = conn.prepareStatement(queryString)
+            val rs = statement.executeQuery()
 
-        for (i in 1..columnCount) {
-            try {
-                columns.add(metaData.getColumnLabel(i))
-            } catch (e: Exception) {
-                log.info("ERROR: at index $i: " + e.message)
-            }
-        }
+            val rows = mutableListOf<List<String>>()
+            val metaData = rs.metaData
+            val columnCount = metaData.columnCount
 
-        rows.add(columns)
-
-        while (rs.next()) {
-            val row = mutableListOf<String>()
+            val columns = mutableListOf<String>()
 
             for (i in 1..columnCount) {
-                try {
-                    row.add(rs.getObject(i).toString())
-                } catch (e: Exception) {
-                    log.info("ERROR: at index $i: " + e.message)
-                    row.add("error")
-                }
+                columns.add(metaData.getColumnLabel(i))
             }
 
-            rows.add(row)
+            rows.add(columns)
+
+            while (rs.next()) {
+                val row = mutableListOf<String>()
+
+                for (i in 1..columnCount) {
+                    val res = rs.getObject(i)
+
+                    row.add(res?.toString() ?: "null")
+                }
+
+                rows.add(row)
+            }
+
+            return DatabaseResult(rows, rows.size - 1)
+        } catch (e: SQLException) {
+            log.info(e.message)
+
+            throw DBException(e.message ?: FALLBACK_ERROR_MESSAGE)
+        } catch (e: Exception) {
+            log.info(e.message)
+
+            throw DBException(e.message ?: FALLBACK_ERROR_MESSAGE)
+        } finally {
+            try {
+                if (conn !== null) {
+                    conn.close()
+                }
+            } catch (e: Exception) {
+                log.info(e.message)
+            }
         }
-
-        rows.forEach {
-            it.forEach(::println)
-        }
-
-        conn.close()
-
-        return DatabaseResult(rows, rows.size - 1)
     }
 
     private fun executeUpdate(queryString: String): DatabaseResult {
