@@ -13,12 +13,11 @@ import javax.sql.DataSource
 typealias Columns = List<List<String>>
 
 class DBException(override val message: String) : RuntimeException(message)
+data class DatabaseResult(val columns: Columns, val rowsAffected: Int)
+
+const val FALLBACK_ERROR_MESSAGE = "Error running query"
 
 class DatabaseController : Controller() {
-
-    val FALLBACK_ERROR_MESSAGE = "Error running query"
-
-    data class DatabaseResult(val columns: Columns, val rowsAffected: Int)
 
     fun executeStatements(statements: List<DBStatement>): List<DatabaseResult> {
         return statements.map {
@@ -127,66 +126,55 @@ class DatabaseController : Controller() {
         return databases
     }
 
-    fun getSchemas(databaseName: String, ds: DataSource): List<String> {
-        val queryString = "SELECT schema_name FROM information_schema.schemata;"
+    fun getSchemas(databaseName: String, ds: DataSource): List<String> = fetch(
+            ds, "SELECT schema_name FROM information_schema.schemata;", "schema_name", databaseName)
 
-        val conn = ds.connection
+    fun getTables(schemaName: String, ds: DataSource): List<String> = fetch(ds,
+            "SELECT table_name FROM information_schema.tables WHERE table_schema = '$schemaName'",
+            "table_name")
 
-        conn.catalog = databaseName
+    fun getRoles(ds: DataSource): List<String> = fetch(ds, "SELECT rolname FROM pg_roles;", "rolname")
 
-        val statement = conn.prepareStatement(queryString)
-        val rs = statement.executeQuery()
+    private fun fetch(dataSource: DataSource, query: String, columnName: String, catalog: String? = null): List<String> {
+        var conn: Connection? = null
 
-        val schemas = mutableListOf<String>()
+        try {
+            conn = dataSource.connection
 
-        while (rs.next()) {
-            val result = rs.getString("schema_name")
+            if (catalog != null) {
+                conn.catalog = catalog
+            }
 
-            if (result != null) {
-                schemas.add(result)
+            val statement = conn.prepareStatement(query)
+            val rs = statement.executeQuery()
+
+            val roles = mutableListOf<String>()
+
+            while (rs.next()) {
+                val result = rs.getString(columnName)
+
+                if (result != null) {
+                    roles.add(result)
+                }
+            }
+
+            return roles
+        } catch (e: SQLException) {
+            log.info(e.message)
+
+            throw DBException(e.message ?: FALLBACK_ERROR_MESSAGE)
+        } catch (e: Exception) {
+            log.info(e.message)
+
+            throw DBException(e.message ?: FALLBACK_ERROR_MESSAGE)
+        } finally {
+            try {
+                if (conn !== null) {
+                    conn.close()
+                }
+            } catch (e: Exception) {
+                log.info(e.message)
             }
         }
-
-        return schemas
-    }
-
-    fun getTables(schemaName: String, ds: DataSource): List<String> {
-        val queryString = "SELECT table_name FROM information_schema.tables WHERE table_schema = '$schemaName'"
-
-        val conn = ds.connection
-        val statement = conn.prepareStatement(queryString)
-        val rs = statement.executeQuery()
-
-        val tables = mutableListOf<String>()
-
-        while (rs.next()) {
-            val result = rs.getString("table_name")
-
-            if (result != null) {
-                tables.add(result)
-            }
-        }
-
-        return tables
-    }
-
-    fun getRoles(ds: DataSource): List<String> {
-        val queryString = "SELECT rolname FROM pg_roles;"
-
-        val conn = ds.connection
-        val statement = conn.prepareStatement(queryString)
-        val rs = statement.executeQuery()
-
-        val roles = mutableListOf<String>()
-
-        while (rs.next()) {
-            val result = rs.getString("rolname")
-
-            if (result != null) {
-                roles.add(result)
-            }
-        }
-
-        return roles
     }
 }
