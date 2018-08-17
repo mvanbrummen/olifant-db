@@ -106,25 +106,8 @@ class DatabaseController : Controller() {
 
     fun executeStoredProc(): Nothing = TODO()
 
-    fun getDatabases(ds: DataSource): List<String> {
-        val queryString = "SELECT datname FROM pg_database WHERE datistemplate = false;"
-
-        val conn = ds.connection
-        val statement = conn.prepareStatement(queryString)
-        val rs = statement.executeQuery()
-
-        val databases = mutableListOf<String>()
-
-        while (rs.next()) {
-            val result = rs.getString("datname")
-
-            if (result != null) {
-                databases.add(result)
-            }
-        }
-
-        return databases
-    }
+    fun getDatabases(ds: DataSource): List<String> = fetch(ds,
+            "SELECT datname FROM pg_database WHERE datistemplate = false;", "datname")
 
     fun getSchemas(databaseName: String, ds: DataSource): List<String> = fetch(
             ds, "SELECT schema_name FROM information_schema.schemata;", "schema_name", databaseName)
