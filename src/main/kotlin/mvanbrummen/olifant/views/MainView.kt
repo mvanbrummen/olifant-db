@@ -92,9 +92,11 @@ class MainView : View("OlifantDB") {
                 tab("Query 1") {
                     vbox {
                         toolbar {
-                            button("Execute", FontAwesomeIconView(FontAwesomeIcon.PLAY)) {
+                            button("", FontAwesomeIconView(FontAwesomeIcon.PLAY)) {
 
                                 shortcut("F5")
+
+                                tooltip("Execute query")
 
                                 action {
                                     val codeAreaText = codeArea.text
