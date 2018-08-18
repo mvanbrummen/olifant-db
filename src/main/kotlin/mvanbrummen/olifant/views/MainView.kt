@@ -2,7 +2,6 @@ package mvanbrummen.olifant.views
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
-import javafx.application.Platform
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.geometry.Orientation
@@ -17,7 +16,6 @@ import mvanbrummen.olifant.db.DatabaseConnection
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
 import tornadofx.*
-import java.lang.System.exit
 import java.time.Duration
 
 const val HEIGHT = 600.0
@@ -31,6 +29,7 @@ class MainView : View("OlifantDB") {
 
     val dbTreeView = find(DatabaseTreeView::class)
     val connectionBar = find(ConnectionBar::class)
+    val menuBar: MenuBar by inject()
 
     val dbTreeContext = find(DatabaseTreeContext::class)
 
@@ -48,23 +47,7 @@ class MainView : View("OlifantDB") {
     override val root = borderpane {
         setPrefSize(WIDTH, HEIGHT)
 
-        top = vbox {
-            menubar {
-                menu("File") {
-                    item("Preferences")
-                    item("Quit") {
-                        action {
-                            Platform.exit()
-                            exit(0)
-                        }
-                    }
-                }
-                menu("Help") {
-                    item("About") {
-                    }
-                }
-            }
-        }
+        top = menuBar.root
 
         center = splitpane {
             vbox {
