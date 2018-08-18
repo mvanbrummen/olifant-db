@@ -5,6 +5,8 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.application.Platform
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
+import javafx.geometry.Orientation
+import javafx.scene.layout.Priority
 import mvanbrummen.olifant.Styles
 import mvanbrummen.olifant.config.ConfigHelper
 import mvanbrummen.olifant.controllers.DatabaseController
@@ -62,100 +64,102 @@ class MainView : View("OlifantDB") {
                     }
                 }
             }
-
-
         }
 
-        left = vbox {
-            toolbar {
-                button("", FontAwesomeIconView(FontAwesomeIcon.PLUS)) {
-                    action {
-                        find(NewServerView::class).openModal()
+        center = splitpane {
+            vbox {
+                toolbar {
+                    button("", FontAwesomeIconView(FontAwesomeIcon.PLUS)) {
+                        action {
+                            find(NewServerView::class).openModal()
+                        }
                     }
-                }
-                button("", FontAwesomeIconView(FontAwesomeIcon.REFRESH)) {
-                    action {
-                        println("Refreshing tree...")
+                    button("", FontAwesomeIconView(FontAwesomeIcon.REFRESH)) {
+                        action {
+                            println("Refreshing tree...")
 
 
-                        // TODO make it render correctly
-                        dbTreeContext.clear()
+                            // TODO make it render correctly
+                            dbTreeContext.clear()
+                        }
                     }
                 }
+
+                this += dbTreeView.root
             }
+            vbox {
+                tabpane {
+                    tab("Query 1") {
+                        vbox {
+                            toolbar {
+                                button("", FontAwesomeIconView(FontAwesomeIcon.PLAY)) {
 
-            this += dbTreeView.root
-        }
+                                    shortcut("F5")
 
-        center = vbox {
-            tabpane {
-                tab("Query 1") {
-                    vbox {
-                        toolbar {
-                            button("", FontAwesomeIconView(FontAwesomeIcon.PLAY)) {
+                                    tooltip("Execute query")
 
-                                shortcut("F5")
+                                    action {
+                                        val codeAreaText = codeArea.text
 
-                                tooltip("Execute query")
+                                        if (codeAreaText.isNotBlank()) {
+                                            runAsync {
+                                                val statements = queryParserController.parseQuery(codeAreaText)
 
-                                action {
-                                    val codeAreaText = codeArea.text
+                                                dbController.executeStatements(statements)
+                                            } ui { entries ->
 
-                                    if (codeAreaText.isNotBlank()) {
-                                        runAsync {
-                                            val statements = queryParserController.parseQuery(codeAreaText)
+                                                // TODO handle collection of results
 
-                                            dbController.executeStatements(statements)
-                                        } ui { entries ->
-
-                                            // TODO handle collection of results
-
-                                            entries.first().columns.first().forEachIndexed { colIndex, name ->
-                                                tableview.column(name, String::class) {
-                                                    value { row ->
-                                                        SimpleStringProperty(row.value[colIndex])
+                                                entries.first().columns.first().forEachIndexed { colIndex, name ->
+                                                    tableview.column(name, String::class) {
+                                                        value { row ->
+                                                            SimpleStringProperty(row.value[colIndex])
+                                                        }
                                                     }
                                                 }
-                                            }
 
-                                            data.setAll(entries.first().columns.drop(1))
+                                                data.setAll(entries.first().columns.drop(1))
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            button("", FontAwesomeIconView(FontAwesomeIcon.STOP)) {
-                                println("stopping query...")
-                            }
-                            separator {}
-                            button("", FontAwesomeIconView(FontAwesomeIcon.COPY))
-                            button("", FontAwesomeIconView(FontAwesomeIcon.PASTE))
-                            separator {}
-                            button("", FontAwesomeIconView(FontAwesomeIcon.SAVE))
-                            button("", FontAwesomeIconView(FontAwesomeIcon.FILE))
-                        }
-                        this += connectionBar
-
-                        val subscribe = codeArea
-                                .multiPlainChanges()
-                                .successionEnds(Duration.ofMillis(500))
-                                .subscribe { change ->
-                                    codeArea.setStyleClass(0, codeArea.length, Styles.keyword.name)
-                                    codeArea.setStyleSpans(0, syntaxController.computeHighlighting(codeArea.text))
+                                button("", FontAwesomeIconView(FontAwesomeIcon.STOP)) {
+                                    println("stopping query...")
                                 }
+                                separator {}
+                                button("", FontAwesomeIconView(FontAwesomeIcon.COPY))
+                                button("", FontAwesomeIconView(FontAwesomeIcon.PASTE))
+                                separator {}
+                                button("", FontAwesomeIconView(FontAwesomeIcon.SAVE))
+                                button("", FontAwesomeIconView(FontAwesomeIcon.FILE))
+                            }
+                            this += connectionBar
 
-                        codeArea.paragraphGraphicFactory = LineNumberFactory.get(codeArea)
+                            val subscribe = codeArea
+                                    .multiPlainChanges()
+                                    .successionEnds(Duration.ofMillis(500))
+                                    .subscribe { change ->
+                                        codeArea.setStyleClass(0, codeArea.length, Styles.keyword.name)
+                                        codeArea.setStyleSpans(0, syntaxController.computeHighlighting(codeArea.text))
+                                    }
 
-                        this += codeArea
+                            codeArea.paragraphGraphicFactory = LineNumberFactory.get(codeArea)
 
-                        // subscribe.unsubscribe() TODO
+                            this += codeArea
+
+                            // subscribe.unsubscribe() TODO
+                        }
                     }
                 }
+                this += tableview
             }
-            this += tableview
+            orientation = Orientation.HORIZONTAL
+
+            setDividerPositions(0.25, 0.75)
+
+            vboxConstraints { vGrow = Priority.ALWAYS }
         }
-
     }
-
 
 }
 
