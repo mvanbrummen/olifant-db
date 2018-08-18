@@ -139,7 +139,16 @@ class MainView : View("OlifantDB") {
                         }
                     }
                 }
-                this += tableview
+                tabpane {
+                    tab("DB Results") {
+                        this += tableview
+                    }
+                    tab("Messages") {
+                        textarea {
+                            isEditable = false
+                        }
+                    }
+                }
 
                 orientation = Orientation.VERTICAL
             }
