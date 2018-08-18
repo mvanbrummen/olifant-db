@@ -13,7 +13,7 @@ import javax.sql.DataSource
 typealias Columns = List<List<String>>
 
 class DBException(override val message: String) : RuntimeException(message)
-data class DatabaseResult(val columns: Columns, val rowsAffected: Int)
+data class DatabaseResult(val columns: Columns = emptyList(), val rowsAffected: Int = 0, val message: String? = null)
 
 const val FALLBACK_ERROR_MESSAGE = "Error running query"
 
@@ -29,6 +29,8 @@ class DatabaseController : Controller() {
     }
 
     private fun executeQuery(queryString: String): DatabaseResult {
+        val rows = mutableListOf<List<String>>()
+
         var conn: Connection? = null
 
         try {
@@ -37,7 +39,6 @@ class DatabaseController : Controller() {
             val statement = conn.prepareStatement(queryString)
             val rs = statement.executeQuery()
 
-            val rows = mutableListOf<List<String>>()
             val metaData = rs.metaData
             val columnCount = metaData.columnCount
 
@@ -65,7 +66,7 @@ class DatabaseController : Controller() {
         } catch (e: SQLException) {
             log.info(e.message)
 
-            throw DBException(e.message ?: FALLBACK_ERROR_MESSAGE)
+            return DatabaseResult(message = e.message)
         } catch (e: Exception) {
             log.info(e.message)
 
@@ -90,6 +91,8 @@ class DatabaseController : Controller() {
             return DatabaseResult(emptyList(), statement.executeUpdate())
         } catch (e: SQLException) {
             log.info(e.message)
+
+            return DatabaseResult(message = e.message)
         } catch (e: Exception) {
             log.info(e.message)
         } finally {

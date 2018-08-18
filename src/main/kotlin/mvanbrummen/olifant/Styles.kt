@@ -4,6 +4,7 @@ import javafx.scene.paint.Color
 import javafx.scene.paint.CycleMethod
 import javafx.scene.paint.LinearGradient
 import javafx.scene.paint.Stop
+import javafx.scene.text.FontPosture
 import javafx.scene.text.FontWeight
 import tornadofx.*
 
@@ -15,6 +16,7 @@ class Styles : Stylesheet() {
         val errorText by cssclass()
         val successText by cssclass()
         val keyword by cssclass()
+        val dbMessages by cssclass()
     }
 
     init {
@@ -42,6 +44,9 @@ class Styles : Stylesheet() {
         keyword {
             fill = Color.MAROON
             fontWeight = FontWeight.BOLD
+        }
+        dbMessages {
+            fontStyle = FontPosture.ITALIC
         }
     }
 }

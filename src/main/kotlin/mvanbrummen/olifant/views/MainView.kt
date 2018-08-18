@@ -107,6 +107,9 @@ class MainView : View("OlifantDB") {
                                                     if (it.rowsAffected > 0) {
                                                         dbMessages.append("${it.rowsAffected} row(s) affected.")
                                                     }
+                                                    if (it.message != null) {
+                                                        dbMessages.append(it.message)
+                                                    }
                                                 }
 
                                                 val lastEntryCols = entries.last().columns
@@ -169,6 +172,8 @@ class MainView : View("OlifantDB") {
                             textProperty().bind(dbMessages)
 
                             isEditable = false
+
+                            addClass(Styles.dbMessages)
                         }
                     }
                 }
