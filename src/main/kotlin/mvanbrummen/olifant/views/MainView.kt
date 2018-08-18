@@ -142,6 +142,14 @@ class MainView : View("OlifantDB") {
                                 separator {}
                                 button("", FontAwesomeIconView(FontAwesomeIcon.SAVE))
                                 button("", FontAwesomeIconView(FontAwesomeIcon.FILE))
+                                separator {}
+                                button("", FontAwesomeIconView(FontAwesomeIcon.TIMES)) {
+                                    tooltip("Clear editor")
+
+                                    action {
+                                        codeArea.clear()
+                                    }
+                                }
                             }
                             this += connectionBar
 
