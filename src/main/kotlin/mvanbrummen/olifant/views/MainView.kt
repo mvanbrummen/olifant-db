@@ -145,6 +145,8 @@ class MainView : View("OlifantDB") {
 
                             codeArea.paragraphGraphicFactory = LineNumberFactory.get(codeArea)
 
+                            codeArea.prefHeightProperty().bind(this.heightProperty())
+
                             this += codeArea
 
                             // subscribe.unsubscribe() TODO
