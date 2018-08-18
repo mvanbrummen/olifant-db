@@ -69,7 +69,7 @@ class PGSyntaxController : Controller() {
     }
 
     fun computeHighlighting(text: String): StyleSpans<List<String>> {
-        val regex = Regex(KEYWORD_PATTERN)
+        val regex = Regex(KEYWORD_PATTERN, RegexOption.IGNORE_CASE)
         val matchResults = regex.findAll(text)
         val spansBuilder = StyleSpansBuilder<List<String>>()
 
