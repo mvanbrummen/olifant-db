@@ -5,6 +5,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.geometry.Orientation
+import javafx.scene.control.TabPane
 import javafx.scene.layout.Priority
 import mvanbrummen.olifant.Styles
 import mvanbrummen.olifant.config.ConfigHelper
@@ -13,6 +14,7 @@ import mvanbrummen.olifant.controllers.DatabaseTreeContext
 import mvanbrummen.olifant.controllers.PGSyntaxController
 import mvanbrummen.olifant.controllers.QueryParserController
 import mvanbrummen.olifant.db.DatabaseConnection
+import mvanbrummen.olifant.util.ObservableStringBuffer
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
 import tornadofx.*
@@ -20,6 +22,9 @@ import java.time.Duration
 
 const val HEIGHT = 600.0
 const val WIDTH = 950.0
+
+const val RESULT_TAB_INDEX = 0
+const val MESSAGES_TAB_INDEX = 1
 
 class MainView : View("OlifantDB") {
 
@@ -36,7 +41,11 @@ class MainView : View("OlifantDB") {
     val data = FXCollections.observableArrayList<List<String>>()
     val tableview = tableview(data)
 
+    val dbMessages = ObservableStringBuffer()
+
     val codeArea = CodeArea()
+
+    val resultTabPane = TabPane()
 
     init {
         if (ConfigHelper.isConnectionSaved(app.config)) {
@@ -94,17 +103,29 @@ class MainView : View("OlifantDB") {
                                                 dbController.executeStatements(statements)
                                             } ui { entries ->
 
-                                                // TODO handle collection of results
-
-                                                entries.first().columns.first().forEachIndexed { colIndex, name ->
-                                                    tableview.column(name, String::class) {
-                                                        value { row ->
-                                                            SimpleStringProperty(row.value[colIndex])
-                                                        }
+                                                entries.forEach {
+                                                    if (it.rowsAffected > 0) {
+                                                        dbMessages.append("${it.rowsAffected} row(s) affected.")
                                                     }
                                                 }
 
-                                                data.setAll(entries.first().columns.drop(1))
+                                                val lastEntryCols = entries.last().columns
+
+                                                if (lastEntryCols.isNotEmpty()) {
+                                                    lastEntryCols.first().forEachIndexed { colIndex, name ->
+                                                        tableview.column(name, String::class) {
+                                                            value { row ->
+                                                                SimpleStringProperty(row.value[colIndex])
+                                                            }
+                                                        }
+                                                    }
+
+                                                    data.setAll(entries.last().columns.drop(1))
+
+                                                    resultTabPane.selectionModel.select(RESULT_TAB_INDEX)
+                                                } else {
+                                                    resultTabPane.selectionModel.select(MESSAGES_TAB_INDEX)
+                                                }
                                             }
                                         }
                                     }
@@ -139,12 +160,14 @@ class MainView : View("OlifantDB") {
                         }
                     }
                 }
-                tabpane {
+                this += resultTabPane.apply {
                     tab("DB Results") {
                         this += tableview
                     }
                     tab("Messages") {
                         textarea {
+                            textProperty().bind(dbMessages)
+
                             isEditable = false
                         }
                     }
