@@ -17,6 +17,7 @@ class Styles : Stylesheet() {
         val successText by cssclass()
         val keyword by cssclass()
         val dbMessages by cssclass()
+        val editorText by cssclass()
     }
 
     init {
@@ -47,6 +48,9 @@ class Styles : Stylesheet() {
         }
         dbMessages {
             fontStyle = FontPosture.ITALIC
+        }
+        editorText {
+            fontSize = 1.2.em
         }
     }
 }

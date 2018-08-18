@@ -164,6 +164,7 @@ class MainView : View("OlifantDB") {
                             codeArea.paragraphGraphicFactory = LineNumberFactory.get(codeArea)
 
                             codeArea.prefHeightProperty().bind(this.heightProperty())
+                            codeArea.addClass(Styles.editorText)
 
                             this += codeArea
 
