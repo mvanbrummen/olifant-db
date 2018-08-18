@@ -94,7 +94,7 @@ class MainView : View("OlifantDB") {
                                     tooltip("Execute query")
 
                                     action {
-                                        val codeAreaText = codeArea.text
+                                        val codeAreaText = if (codeArea.selectedText.isNotEmpty()) codeArea.selectedText else codeArea.text
 
                                         if (codeAreaText.isNotBlank()) {
                                             runAsync {
