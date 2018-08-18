@@ -61,14 +61,17 @@ class MainView : View("OlifantDB") {
                         action {
                             println("Refreshing tree...")
 
-
                             // TODO make it render correctly
                             dbTreeContext.clear()
                         }
                     }
                 }
 
-                this += dbTreeView.root
+                val treeView = dbTreeView.root
+
+                treeView.prefHeightProperty().bind(this.heightProperty())
+
+                this += treeView
             }
             splitpane {
                 tabpane {
