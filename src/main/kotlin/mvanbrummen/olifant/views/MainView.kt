@@ -87,7 +87,7 @@ class MainView : View("OlifantDB") {
 
                 this += dbTreeView.root
             }
-            vbox {
+            splitpane {
                 tabpane {
                     tab("Query 1") {
                         vbox {
@@ -152,6 +152,8 @@ class MainView : View("OlifantDB") {
                     }
                 }
                 this += tableview
+
+                orientation = Orientation.VERTICAL
             }
             orientation = Orientation.HORIZONTAL
 
