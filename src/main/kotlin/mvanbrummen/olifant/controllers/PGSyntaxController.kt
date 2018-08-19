@@ -65,7 +65,7 @@ class PGSyntaxController : Controller() {
                 "WHERE", "WITH", "WITHOUT", "WORK", "WRITE", "YEAR", "ZONE"
         )
 
-        val KEYWORD_PATTERN = "\\b(" + KEYWORDS.joinToString("|") + "\\b)"
+        val KEYWORD_PATTERN = "\\b(" + KEYWORDS.joinToString("|") + ")\\b"
     }
 
     fun computeHighlighting(text: String): StyleSpans<List<String>> {
