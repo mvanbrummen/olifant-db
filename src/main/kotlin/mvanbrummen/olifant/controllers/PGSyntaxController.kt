@@ -78,9 +78,12 @@ class PGSyntaxController : Controller() {
         matchResults.iterator().forEach { res ->
             val range = res.range
 
-            spansBuilder.add(emptyList(), range.first - lastKwEnd)
-            spansBuilder.add(listOf(Styles.keyword.name), range.last - range.first)
-            lastKwEnd = range.last
+            val first = range.first
+            val last = if (range.last == 0) 0 else range.last + 1
+
+            spansBuilder.add(emptyList(), first - lastKwEnd)
+            spansBuilder.add(listOf(Styles.keyword.name), last - first)
+            lastKwEnd = last
         }
 
         spansBuilder.add(emptyList(), text.length - lastKwEnd)
