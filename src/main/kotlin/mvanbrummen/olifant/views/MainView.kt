@@ -7,6 +7,7 @@ import javafx.collections.FXCollections
 import javafx.geometry.Orientation
 import javafx.scene.control.TabPane
 import javafx.scene.layout.Priority
+import javafx.stage.FileChooser
 import mvanbrummen.olifant.Styles
 import mvanbrummen.olifant.config.ConfigHelper
 import mvanbrummen.olifant.controllers.DatabaseController
@@ -46,6 +47,8 @@ class MainView : View("OlifantDB") {
     val codeArea = CodeArea()
 
     val resultTabPane = TabPane()
+
+    private val extensionFilters = arrayOf(FileChooser.ExtensionFilter("SQL Scripts (*.sql)", "*.sql"))
 
     init {
         if (ConfigHelper.isConnectionSaved(app.config)) {
@@ -141,7 +144,23 @@ class MainView : View("OlifantDB") {
                                 button("", FontAwesomeIconView(FontAwesomeIcon.PASTE))
                                 separator {}
                                 button("", FontAwesomeIconView(FontAwesomeIcon.SAVE))
-                                button("", FontAwesomeIconView(FontAwesomeIcon.FILE))
+                                button("", FontAwesomeIconView(FontAwesomeIcon.FILE)) {
+
+                                    tooltip("Open SQL file")
+
+                                    action {
+                                        val files = chooseFile("Select File", extensionFilters, FileChooserMode.Single)
+
+                                        if (files.isNotEmpty()) {
+
+                                            val file = files.first()
+
+                                            val fileText = file.readText(Charsets.UTF_8) // TODO read into a buffer instead
+
+                                            codeArea.replaceText(fileText)
+                                        }
+                                    }
+                                }
                                 separator {}
                                 button("", FontAwesomeIconView(FontAwesomeIcon.TIMES)) {
                                     tooltip("Clear editor")
