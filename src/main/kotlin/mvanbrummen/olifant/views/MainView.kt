@@ -10,10 +10,7 @@ import javafx.scene.layout.Priority
 import javafx.stage.FileChooser
 import mvanbrummen.olifant.Styles
 import mvanbrummen.olifant.config.ConfigHelper
-import mvanbrummen.olifant.controllers.DatabaseController
-import mvanbrummen.olifant.controllers.DatabaseTreeContext
-import mvanbrummen.olifant.controllers.PGSyntaxController
-import mvanbrummen.olifant.controllers.QueryParserController
+import mvanbrummen.olifant.controllers.*
 import mvanbrummen.olifant.db.DatabaseConnection
 import mvanbrummen.olifant.util.ObservableStringBuffer
 import org.fxmisc.richtext.CodeArea
@@ -32,6 +29,7 @@ class MainView : View("OlifantDB") {
     val dbController: DatabaseController by inject()
     val syntaxController: PGSyntaxController by inject()
     val queryParserController: QueryParserController by inject()
+    val fileController: FileController by inject()
 
     val dbTreeView = find(DatabaseTreeView::class)
     val connectionBar = find(ConnectionBar::class)
@@ -149,7 +147,7 @@ class MainView : View("OlifantDB") {
                                     action {
                                         val files = chooseFile("Save File", extensionFilters, FileChooserMode.Save)
 
-                                        if (files.isNotEmpty()) files.first().writeText(codeArea.text, Charsets.UTF_8)
+                                        fileController.saveTextToFile(files, codeArea.text)
                                     }
                                 }
                                 button("", FontAwesomeIconView(FontAwesomeIcon.FILE)) {
@@ -159,14 +157,9 @@ class MainView : View("OlifantDB") {
                                     action {
                                         val files = chooseFile("Select File", extensionFilters, FileChooserMode.Single)
 
-                                        if (files.isNotEmpty()) {
+                                        val text = fileController.readTextFromFile(files)
 
-                                            val file = files.first()
-
-                                            val fileText = file.readText(Charsets.UTF_8) // TODO read into a buffer instead
-
-                                            codeArea.replaceText(fileText)
-                                        }
+                                        if (text != null) codeArea.replaceText(text)
                                     }
                                 }
                                 separator {}
