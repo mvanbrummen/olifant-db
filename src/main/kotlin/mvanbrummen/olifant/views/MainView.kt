@@ -143,10 +143,18 @@ class MainView : View("OlifantDB") {
                                 button("", FontAwesomeIconView(FontAwesomeIcon.COPY))
                                 button("", FontAwesomeIconView(FontAwesomeIcon.PASTE))
                                 separator {}
-                                button("", FontAwesomeIconView(FontAwesomeIcon.SAVE))
+                                button("", FontAwesomeIconView(FontAwesomeIcon.SAVE)) {
+                                    tooltip("Save file")
+
+                                    action {
+                                        val files = chooseFile("Save File", extensionFilters, FileChooserMode.Save)
+
+                                        if (files.isNotEmpty()) files.first().writeText(codeArea.text, Charsets.UTF_8)
+                                    }
+                                }
                                 button("", FontAwesomeIconView(FontAwesomeIcon.FILE)) {
 
-                                    tooltip("Open SQL file")
+                                    tooltip("Open file")
 
                                     action {
                                         val files = chooseFile("Select File", extensionFilters, FileChooserMode.Single)
