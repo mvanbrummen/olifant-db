@@ -69,7 +69,7 @@ class NewServerView : Fragment("Create new connection") {
 
                                 ConfigHelper.saveConnection(app.config, databaseConnection)
 
-                                closeModal()
+                                close()
                             } catch (e: Exception) {
                                 log.info(e.message)
 
