@@ -36,9 +36,9 @@ class QueryPaneView : View() {
     val codeArea = CodeArea()
     val resultTabPane = TabPane()
 
-    override val root = splitpane {
-        tabpane {
-            tab("Query 1") {
+    override val root = tabpane {
+        tab("Query 1") {
+            splitpane {
                 vbox {
                     toolbar {
                         button("", FontAwesomeIconView(FontAwesomeIcon.PLAY)) {
@@ -142,24 +142,26 @@ class QueryPaneView : View() {
                     this += codeArea
 
                     // subscribe.unsubscribe() TODO
+
+
                 }
+                this += resultTabPane.apply {
+                    tab("DB Results") {
+                        this += tableview
+                    }
+                    tab("Messages") {
+                        textarea {
+                            textProperty().bind(dbMessages)
+
+                            isEditable = false
+
+                            addClass(Styles.dbMessages)
+                        }
+                    }
+                }
+
+                orientation = Orientation.VERTICAL
             }
         }
-        this += resultTabPane.apply {
-            tab("DB Results") {
-                this += tableview
-            }
-            tab("Messages") {
-                textarea {
-                    textProperty().bind(dbMessages)
-
-                    isEditable = false
-
-                    addClass(Styles.dbMessages)
-                }
-            }
-        }
-
-        orientation = Orientation.VERTICAL
     }
 }
