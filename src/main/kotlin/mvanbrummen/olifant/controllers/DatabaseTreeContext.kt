@@ -33,6 +33,10 @@ class DatabaseTreeContext : Controller() {
     }
 
     fun addDatabaseConnectionTreeItem(connectionName: String) {
+        databaseConnections.add(DatabaseConnection(connectionName))
+    }
+
+    fun setAllDatabaseConnectionTreeItem(connectionName: String) {
         databaseConnections.setAll(DatabaseConnection(connectionName))
     }
 
