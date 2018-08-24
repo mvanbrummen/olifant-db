@@ -12,7 +12,6 @@ import mvanbrummen.olifant.controllers.DatabaseController
 import mvanbrummen.olifant.controllers.FileController
 import mvanbrummen.olifant.controllers.PGSyntaxController
 import mvanbrummen.olifant.controllers.QueryParserController
-import mvanbrummen.olifant.util.ObservableStringBuffer
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
 import tornadofx.*
@@ -26,13 +25,13 @@ class QueryPaneView : View() {
     val queryParserController: QueryParserController by inject()
     val fileController: FileController by inject()
     val syntaxController: PGSyntaxController by inject()
+    val messagesTextArea: MessagesTextArea by inject()
 
     val connectionBar = find(ConnectionBar::class)
 
     val data = FXCollections.observableArrayList<List<String>>()
     val tableview = tableview(data)
 
-    val dbMessages = ObservableStringBuffer()
     val codeArea = CodeArea()
     val resultTabPane = TabPane()
 
@@ -59,10 +58,10 @@ class QueryPaneView : View() {
 
                                         entries.forEach {
                                             if (it.rowsAffected > 0) {
-                                                dbMessages.append("${it.rowsAffected} row(s) affected.")
+                                                fire(DBMessage("${it.rowsAffected} row(s) affected."))
                                             }
                                             if (it.message != null) {
-                                                dbMessages.append(it.message)
+                                                fire(DBMessage(it.message))
                                             }
                                         }
 
@@ -150,13 +149,7 @@ class QueryPaneView : View() {
                         this += tableview
                     }
                     tab("Messages") {
-                        textarea {
-                            textProperty().bind(dbMessages)
-
-                            isEditable = false
-
-                            addClass(Styles.dbMessages)
-                        }
+                        this += messagesTextArea
                     }
                 }
 
