@@ -46,7 +46,7 @@ class DatabaseTreeContext : Controller() {
         runAsync {
             databaseController.getDatabases(ds)
         } ui {
-            addDatabaseConnectionTreeItem(connectionName) // TODO remove
+            setAllDatabaseConnectionTreeItem(connectionName) // TODO remove
             databases.setAll(FXCollections.observableArrayList(
                     it.map { Database(it, connectionName) })
             )
