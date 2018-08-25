@@ -2,14 +2,11 @@ package mvanbrummen.olifant.views
 
 import mvanbrummen.olifant.Styles
 import mvanbrummen.olifant.util.ObservableStringBuffer
-import tornadofx.FXEvent
-import tornadofx.View
-import tornadofx.addClass
-import tornadofx.textarea
+import tornadofx.*
 
 data class DBMessage(val message: String) : FXEvent()
 
-class MessagesTextArea : View() {
+class MessagesTextArea : Fragment() {
 
     val dbMessages = ObservableStringBuffer()
 

@@ -16,7 +16,6 @@ class MainView : View("OlifantDB") {
 
     val menuBar: MenuBar by inject()
     val objectExplorerView: ObjectExplorerView by inject()
-    val queryPaneView: QueryPaneView by inject()
 
     init {
         if (ConfigHelper.isConnectionSaved(app.config)) {
@@ -31,7 +30,7 @@ class MainView : View("OlifantDB") {
 
         center = splitpane {
             this += objectExplorerView.root
-            this += queryPaneView
+            this += find(QueryPaneView::class)
 
             orientation = Orientation.HORIZONTAL
 
