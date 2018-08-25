@@ -1,6 +1,5 @@
 package mvanbrummen.olifant.controllers
 
-import mvanbrummen.olifant.db.DatabaseConnection
 import mvanbrummen.olifant.models.DBStatement
 import mvanbrummen.olifant.models.QueryStatement
 import mvanbrummen.olifant.models.UpdateStatement
@@ -19,22 +18,22 @@ const val FALLBACK_ERROR_MESSAGE = "Error running query"
 
 class DatabaseController : Controller() {
 
-    fun executeStatements(statements: List<DBStatement>): List<DatabaseResult> {
+    fun executeStatements(ds: DataSource, statements: List<DBStatement>): List<DatabaseResult> {
         return statements.map {
             when (it) {
-                is QueryStatement -> executeQuery(it.queryString)
-                is UpdateStatement -> executeUpdate(it.queryString)
+                is QueryStatement -> executeQuery(ds, it.queryString)
+                is UpdateStatement -> executeUpdate(ds, it.queryString)
             }
         }
     }
 
-    private fun executeQuery(queryString: String): DatabaseResult {
+    private fun executeQuery(ds: DataSource, queryString: String): DatabaseResult {
         val rows = mutableListOf<List<String>>()
 
         var conn: Connection? = null
 
         try {
-            conn = DatabaseConnection.getDataSource().connection
+            conn = ds.connection
 
             val statement = conn.prepareStatement(queryString)
             val rs = statement.executeQuery()
@@ -82,10 +81,10 @@ class DatabaseController : Controller() {
         }
     }
 
-    private fun executeUpdate(queryString: String): DatabaseResult {
+    private fun executeUpdate(ds: DataSource, queryString: String): DatabaseResult {
         var conn: Connection? = null
         try {
-            conn = DatabaseConnection.getDataSource().connection
+            conn = ds.connection
             val statement = conn.prepareStatement(queryString)
 
             return DatabaseResult(emptyList(), statement.executeUpdate())
@@ -121,11 +120,11 @@ class DatabaseController : Controller() {
 
     fun getRoles(ds: DataSource): List<String> = fetch(ds, "SELECT rolname FROM pg_roles;", "rolname")
 
-    private fun fetch(dataSource: DataSource, query: String, columnName: String, catalog: String? = null): List<String> {
+    private fun fetch(ds: DataSource, query: String, columnName: String, catalog: String? = null): List<String> {
         var conn: Connection? = null
 
         try {
-            conn = dataSource.connection
+            conn = ds.connection
 
             if (catalog != null) {
                 conn.catalog = catalog

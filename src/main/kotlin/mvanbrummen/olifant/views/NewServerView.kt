@@ -6,7 +6,6 @@ import mvanbrummen.olifant.config.ConfigHelper
 import mvanbrummen.olifant.controllers.DatabaseTreeContext
 import mvanbrummen.olifant.db.DatabaseConnection
 import mvanbrummen.olifant.models.DatabaseConnectionInfo
-import org.postgresql.ds.PGSimpleDataSource
 import tornadofx.*
 
 const val TEST_CONNECTION = "select 1"
@@ -63,7 +62,7 @@ class NewServerView : Fragment("Create new connection") {
                                 conn.createStatement().executeQuery(TEST_CONNECTION)
                                 conn.close()
 
-                                DatabaseConnection.add(ds)
+                                DatabaseConnection.add(databaseConnection.connectionName, ds)
 
                                 databaseTreeContext.addDatabaseConnectionTreeItem(databaseConnection.connectionName)
 
@@ -114,10 +113,11 @@ class NewServerView : Fragment("Create new connection") {
         }
     }
 
-    private fun getDataSource() = PGSimpleDataSource().apply {
-        url = "jdbc:postgresql://${databaseConnection.hostProperty().get()}:${databaseConnection.portProperty().get()}/${databaseConnection.databaseNameProperty().get()}"
-        user = databaseConnection.usernameProperty().get()
-        password = databaseConnection.passwordProperty().get()
-    }
-
+    private fun getDataSource() = DatabaseConnection.createDataSource(
+            databaseConnection.host,
+            databaseConnection.port,
+            databaseConnection.username,
+            databaseConnection.password,
+            databaseConnection.databaseName
+    )
 }

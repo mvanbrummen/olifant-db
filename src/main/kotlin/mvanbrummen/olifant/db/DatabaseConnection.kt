@@ -1,15 +1,21 @@
 package mvanbrummen.olifant.db
 
+import com.zaxxer.hikari.HikariDataSource
 import javax.sql.DataSource
 
 class DatabaseConnection {
     companion object {
 
-        private val dataSources = mutableListOf<DataSource>()
+        private val dataSources = mutableMapOf<String, DataSource>()
 
-        fun add(ds: DataSource) = dataSources.add(ds)
+        fun add(connectionName: String, ds: DataSource) = dataSources.put(connectionName, ds)
 
-        fun getDataSource(): DataSource = dataSources.first()
+        fun getDataSource(connectionName: String): DataSource? = dataSources[connectionName]
+
+        fun createDataSource(host: String, port: Int, username: String, password: String, databaseName: String) = HikariDataSource().apply {
+            jdbcUrl = "jdbc:postgresql://$host:$port/$databaseName"
+            this.username = username
+            this.password = password
+        }
     }
-
 }

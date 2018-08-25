@@ -18,9 +18,10 @@ import org.fxmisc.richtext.LineNumberFactory
 import org.reactfx.Subscription
 import tornadofx.*
 import java.time.Duration
+import javax.sql.DataSource
 
 
-data class TabEvent(val name: String) : FXEvent()
+data class TabEvent(val name: String, val ds: DataSource) : FXEvent()
 
 class QueryPaneView : Fragment() {
 
@@ -86,7 +87,7 @@ class QueryPaneView : Fragment() {
                                         runAsync {
                                             val statements = queryParserController.parseQuery(codeAreaText)
 
-                                            dbController.executeStatements(statements)
+                                            dbController.executeStatements(it.ds, statements)
                                         } ui { entries ->
 
                                             entries.forEach {

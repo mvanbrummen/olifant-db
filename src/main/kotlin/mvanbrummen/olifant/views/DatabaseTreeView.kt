@@ -59,22 +59,26 @@ class DatabaseTreeView : View() {
                 is RolesRoot -> EventHandler { mouseEvent ->
                     println("Role clicked: " + it.name)
 
-                    dbTreeContext.addRoleTreeItem(it.databaseConnectionName, mvanbrummen.olifant.db.DatabaseConnection.getDataSource())
+                    dbTreeContext.addRoleTreeItem(it.databaseConnectionName, mvanbrummen.olifant.db.DatabaseConnection.getDataSource("test")
+                            ?: throw RuntimeException("No datasource found"))
                 }
                 is DatabaseRoot -> EventHandler { mouseEvent ->
                     println("DB Root clicked: " + it.name)
 
-                    dbTreeContext.addDatabaseTreeItem(it.name, mvanbrummen.olifant.db.DatabaseConnection.getDataSource())
+                    dbTreeContext.addDatabaseTreeItem(it.name, mvanbrummen.olifant.db.DatabaseConnection.getDataSource("test")
+                            ?: throw RuntimeException("No datasource found"))
                 }
                 is SchemaRoot -> EventHandler { mouseEvent ->
                     println("Schema Root clicked: " + it.name)
 
-                    dbTreeContext.addSchemaTreeItem(it.databaseName, mvanbrummen.olifant.db.DatabaseConnection.getDataSource())
+                    dbTreeContext.addSchemaTreeItem(it.databaseName, mvanbrummen.olifant.db.DatabaseConnection.getDataSource("test")
+                            ?: throw RuntimeException("No datasource found"))
                 }
                 is TableRoot -> EventHandler { mouseEvent ->
                     println("Table Root clicked: " + it.name)
 
-                    dbTreeContext.addTableTreeItem(it.schemaName, mvanbrummen.olifant.db.DatabaseConnection.getDataSource())
+                    dbTreeContext.addTableTreeItem(it.schemaName, mvanbrummen.olifant.db.DatabaseConnection.getDataSource("test")
+                            ?: throw RuntimeException("No datasource found"))
                 }
                 else -> EventHandler {
 

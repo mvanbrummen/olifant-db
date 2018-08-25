@@ -1,6 +1,8 @@
 package mvanbrummen.olifant.views
 
 import javafx.application.Platform
+import mvanbrummen.olifant.config.ConfigHelper
+import mvanbrummen.olifant.db.DatabaseConnection
 import tornadofx.*
 
 class MenuBar : View() {
@@ -11,7 +13,12 @@ class MenuBar : View() {
                 item("Preferences")
                 item("New Query...") {
                     action {
-                        fire(TabEvent("New Query "))
+                        // TODO move to the tree view and do properly
+                        if (ConfigHelper.isConnectionSaved(app.config)) {
+                            DatabaseConnection.add("test", ConfigHelper.getSavedConnectionDataSource(app.config))
+
+                            fire(TabEvent("New Query ", ConfigHelper.getSavedConnectionDataSource(app.config)))
+                        }
                     }
                 }
                 item("Quit") {

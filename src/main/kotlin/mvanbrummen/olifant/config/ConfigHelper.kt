@@ -1,7 +1,7 @@
 package mvanbrummen.olifant.config
 
+import mvanbrummen.olifant.db.DatabaseConnection
 import mvanbrummen.olifant.models.DatabaseConnectionInfo
-import org.postgresql.ds.PGSimpleDataSource
 import tornadofx.ConfigProperties
 import javax.sql.DataSource
 
@@ -25,11 +25,7 @@ object ConfigHelper {
         val pword = if (config.string(PASSWORD_KEY) == null) "" else config.string(PASSWORD_KEY)
         val databaseName = config.string(DATABASE_NAME_KEY)
 
-        return PGSimpleDataSource().apply {
-            url = "jdbc:postgresql://$host:$port/$databaseName"
-            user = username
-            password = pword
-        }
+        return DatabaseConnection.createDataSource(host, port ?: 5432, username, pword, databaseName)
     }
 
     fun saveConnection(config: ConfigProperties, databaseConnection: DatabaseConnectionInfo) {
