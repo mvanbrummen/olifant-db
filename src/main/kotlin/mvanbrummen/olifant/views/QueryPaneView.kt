@@ -4,6 +4,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
+import javafx.event.EventHandler
 import javafx.geometry.Orientation
 import javafx.scene.control.TabPane
 import javafx.stage.FileChooser
@@ -14,6 +15,7 @@ import mvanbrummen.olifant.controllers.PGSyntaxController
 import mvanbrummen.olifant.controllers.QueryParserController
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
+import org.reactfx.Subscription
 import tornadofx.*
 import java.time.Duration
 
@@ -32,14 +34,41 @@ class QueryPaneView : Fragment() {
 
     override val root = tabpane {
 
+        val selectionModel = this.selectionModel
+
         subscribe<TabEvent> {
 
             tab(it.name) {
+                selectionModel.select(this)
+
                 val data = FXCollections.observableArrayList<List<String>>()
                 val tableview = tableview(data)
 
                 val codeArea = CodeArea()
+
+                fun subscribeToCodeArea(): Subscription = codeArea
+                        .multiPlainChanges()
+                        .successionEnds(Duration.ofMillis(500))
+                        .subscribe { change ->
+                            codeArea.setStyleClass(0, codeArea.length, Styles.keyword.name)
+                            codeArea.setStyleSpans(0, syntaxController.computeHighlighting(codeArea.text))
+                        }
+
+                var subscribe: Subscription = subscribeToCodeArea()
+
                 val resultTabPane = TabPane()
+
+                onSelectionChanged = EventHandler { event ->
+                    if (this.isSelected) {
+                        log.info("Subscribing to syntax highlighting for tab: ${it.name}")
+
+                        subscribe = subscribeToCodeArea()
+                    } else {
+                        log.info("Unsubscribing to syntax highlighting for tab: ${it.name}")
+
+                        subscribe.unsubscribe()
+                    }
+                }
 
                 splitpane {
                     vbox {
@@ -91,7 +120,9 @@ class QueryPaneView : Fragment() {
                                 }
                             }
                             button("", FontAwesomeIconView(FontAwesomeIcon.STOP)) {
-                                println("stopping query...")
+                                action {
+                                    println("stopping query...")
+                                }
                             }
                             separator {}
                             button("", FontAwesomeIconView(FontAwesomeIcon.COPY))
@@ -129,13 +160,7 @@ class QueryPaneView : Fragment() {
                         }
                         this += find(ConnectionBar::class)
 
-                        val subscribe = codeArea
-                                .multiPlainChanges()
-                                .successionEnds(Duration.ofMillis(500))
-                                .subscribe { change ->
-                                    codeArea.setStyleClass(0, codeArea.length, Styles.keyword.name)
-                                    codeArea.setStyleSpans(0, syntaxController.computeHighlighting(codeArea.text))
-                                }
+
 
                         codeArea.paragraphGraphicFactory = LineNumberFactory.get(codeArea)
 
@@ -143,10 +168,6 @@ class QueryPaneView : Fragment() {
                         codeArea.addClass(Styles.editorText)
 
                         this += codeArea
-
-                        // subscribe.unsubscribe() TODO
-
-
                     }
                     this += resultTabPane.apply {
                         tab("DB Results") {
