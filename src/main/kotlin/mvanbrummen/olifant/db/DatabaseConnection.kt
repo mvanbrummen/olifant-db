@@ -12,10 +12,10 @@ class DatabaseConnection {
 
         fun getDataSource(connectionName: String): DataSource? = dataSources[connectionName]
 
-        fun createDataSource(host: String, port: Int, username: String, password: String, databaseName: String) = HikariDataSource().apply {
+        fun createDataSource(host: String, port: Int, username: String, password: String?, databaseName: String) = HikariDataSource().apply {
             jdbcUrl = "jdbc:postgresql://$host:$port/$databaseName"
             this.username = username
-            this.password = password
+            this.password = password ?: ""
         }
     }
 }
