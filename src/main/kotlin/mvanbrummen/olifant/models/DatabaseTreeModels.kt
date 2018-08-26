@@ -1,20 +1,33 @@
 package mvanbrummen.olifant.models
 
-sealed class DatabaseTreeItem(open val name: String)
-object TreeRoot : DatabaseTreeItem("Dummy")
+sealed class DatabaseTreeItem(open val name: String, open val children: List<DatabaseTreeItem> = emptyList())
+data class TreeRoot(override val children: List<DatabaseConnection>) : DatabaseTreeItem("Dummy", children)
 
-data class DatabaseConnection(override val name: String) : DatabaseTreeItem(name)
+data class DatabaseConnection(
+        override val name: String,
+        override val children: List<DatabaseTreeItem> = listOf(DatabaseRoot(name), RolesRoot(name))
+) : DatabaseTreeItem(name, children)
+
+
 data class Database(override val name: String, val databaseConnectionName: String) : DatabaseTreeItem(name)
-data class Schema(override val name: String, val databaseName: String) : DatabaseTreeItem(name)
-data class Table(override val name: String, val schemaName: String) : DatabaseTreeItem(name)
 data class Role(override val name: String, val databaseConnectionName: String) : DatabaseTreeItem(name)
 
-class DatabaseRoot(val databaseConnectionName: String) : DatabaseTreeItem("Databases")
-class RolesRoot(val databaseConnectionName: String) : DatabaseTreeItem("Roles")
+data class Schema(override val name: String, val databaseName: String) : DatabaseTreeItem(name)
+data class Table(override val name: String, val schemaName: String) : DatabaseTreeItem(name)
 
-class SchemaRoot(val databaseName: String): DatabaseTreeItem("Schemas")
+data class DatabaseRoot(
+        val databaseConnectionName: String,
+        override val children: List<Database> = emptyList()
+) : DatabaseTreeItem("Databases", children)
 
-class TableRoot(val schemaName: String): DatabaseTreeItem("Tables")
-class ViewRoot(val schemaName: String): DatabaseTreeItem("Views")
-class SequenceRoot(val schemaName: String): DatabaseTreeItem("Sequences")
-class FunctionRoot(val schemaName: String): DatabaseTreeItem("Functions")
+data class RolesRoot(
+        val databaseConnectionName: String,
+        override val children: List<Role> = emptyList()
+) : DatabaseTreeItem("Roles", children)
+
+data class SchemaRoot(val databaseName: String) : DatabaseTreeItem("Schemas")
+
+data class TableRoot(val schemaName: String) : DatabaseTreeItem("Tables")
+data class ViewRoot(val schemaName: String) : DatabaseTreeItem("Views")
+data class SequenceRoot(val schemaName: String) : DatabaseTreeItem("Sequences")
+data class FunctionRoot(val schemaName: String) : DatabaseTreeItem("Functions")

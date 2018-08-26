@@ -64,7 +64,7 @@ class NewServerView : Fragment("Create new connection") {
 
                                 DatabaseConnection.add(databaseConnection.connectionName, ds)
 
-                                databaseTreeContext.addDatabaseConnectionTreeItem(databaseConnection.connectionName)
+                                databaseTreeContext.addDatabaseConnectionTreeItem(databaseConnection.connectionName, ds)
 
                                 ConfigHelper.saveConnection(app.config, databaseConnection)
 

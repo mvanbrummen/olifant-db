@@ -1,7 +1,6 @@
 package mvanbrummen.olifant.controllers
 
 import javafx.collections.FXCollections
-import mvanbrummen.olifant.config.ConfigHelper
 import mvanbrummen.olifant.models.*
 import tornadofx.Controller
 import javax.sql.DataSource
@@ -12,78 +11,24 @@ class DatabaseTreeContext : Controller() {
     val databaseController: DatabaseController by inject()
 
     val databaseConnections = FXCollections.observableArrayList<DatabaseConnection>()
-    val databases = FXCollections.observableArrayList<Database>()
-    val schemas = FXCollections.observableArrayList<Schema>()
-    val tables = FXCollections.observableArrayList<Table>()
-    val roles = FXCollections.observableArrayList<Role>()
 
-    init {
-        if (ConfigHelper.isConnectionSaved(app.config)) {
-            databaseConnections.setAll(FXCollections.observableArrayList(
-                    DatabaseConnection(ConfigHelper.getSavedConnectionName(app.config)))
-            )
-        }
+    fun addDatabaseConnectionTreeItem(connectionName: String, ds: DataSource) {
+        databaseConnections.add(
+                DatabaseConnection
+                (
+                        connectionName,
+                        listOf(
+                                DatabaseRoot(connectionName, getDatabases(connectionName, ds)),
+                                RolesRoot(connectionName, getRoles(connectionName, ds))
+                        )
+                )
+        )
     }
 
-    fun clear() {
-        databases.clear()
-        schemas.clear()
-        tables.clear()
-        roles.clear()
-    }
+    fun getDatabases(connectionName: String, ds: DataSource) =
+            databaseController.getDatabases(ds).map { Database(it, connectionName) }
 
-    fun addDatabaseConnectionTreeItem(connectionName: String) {
-        databaseConnections.add(DatabaseConnection(connectionName))
-    }
-
-    fun setAllDatabaseConnectionTreeItem(connectionName: String) {
-        databaseConnections.setAll(DatabaseConnection(connectionName))
-    }
-
-    //TODO fix re-rendering of all below
-
-    fun addDatabaseTreeItem(connectionName: String, ds: DataSource) {
-        runAsync {
-            databaseController.getDatabases(ds)
-        } ui {
-            setAllDatabaseConnectionTreeItem(connectionName) // TODO remove
-            databases.setAll(FXCollections.observableArrayList(
-                    it.map { Database(it, connectionName) })
-            )
-        }
-    }
-
-    fun addSchemaTreeItem(databaseName: String, ds: DataSource) {
-        runAsync {
-            databaseController.getSchemas(databaseName, ds)
-        } ui {
-            schemas.setAll(FXCollections.observableArrayList(
-                    it.map { Schema(it, databaseName) })
-            )
-        }
-
-    }
-
-    fun addTableTreeItem(schemaName: String, ds: DataSource) {
-        runAsync {
-            databaseController.getTables(schemaName, ds)
-        } ui {
-            tables.setAll(FXCollections.observableArrayList(
-                    it.map { Table(it, schemaName) })
-            )
-        }
-
-    }
-
-    fun addRoleTreeItem(connectionName: String, ds: DataSource) {
-        runAsync {
-            databaseController.getRoles(ds)
-        } ui {
-            roles.setAll(FXCollections.observableArrayList(
-                    it.map { Role(it, connectionName) })
-            )
-        }
-
-    }
+    fun getRoles(connectionName: String, ds: DataSource) =
+            databaseController.getRoles(ds).map { Role(it, connectionName) }
 
 }

@@ -20,8 +20,6 @@ class ObjectExplorerView : View() {
                 action {
                     println("Refreshing tree...")
 
-                    // TODO make it render correctly
-                    dbTreeContext.clear()
                 }
             }
         }
