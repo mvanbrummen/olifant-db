@@ -3,12 +3,10 @@ package mvanbrummen.olifant.views
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import javafx.scene.control.TreeItem
+import mvanbrummen.olifant.config.ConfigHelper
 import mvanbrummen.olifant.controllers.DatabaseTreeContext
 import mvanbrummen.olifant.models.*
-import tornadofx.View
-import tornadofx.cellFormat
-import tornadofx.populate
-import tornadofx.treeview
+import tornadofx.*
 
 class DatabaseTreeView : View() {
 
@@ -18,6 +16,23 @@ class DatabaseTreeView : View() {
         root = TreeItem(TreeRoot(dbTreeContext.databaseConnections))
 
         isShowRoot = false
+
+        contextMenu = contextmenu {
+            item("New Query...") {
+                action {
+                    selectedValue?.apply {
+                        when (this) {
+                            is Database -> {
+                                fire(TabEvent("New Query", ConfigHelper.getSavedConnectionDataSource(app.config)))
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+        onUserSelect { println(it) }
 
         cellFormat {
             text = it.name

@@ -3,6 +3,7 @@ package mvanbrummen.olifant.controllers
 import javafx.collections.FXCollections
 import mvanbrummen.olifant.models.*
 import tornadofx.Controller
+import tornadofx.success
 import javax.sql.DataSource
 
 
@@ -13,12 +14,11 @@ class DatabaseTreeContext : Controller() {
     val databaseConnections = FXCollections.observableArrayList<DatabaseConnection>()
 
     fun addDatabaseConnectionTreeItem(connectionName: String, ds: DataSource) {
-        databaseConnections.add(
-                DatabaseConnection(
-                        connectionName,
-                        getDatabaseConnectionChildren(connectionName, ds)
-                )
-        )
+        runAsync {
+            getDatabaseConnectionChildren(connectionName, ds)
+        } success {
+            databaseConnections.add(DatabaseConnection(connectionName, it))
+        }
     }
 
     fun getDatabaseConnectionChildren(connectionName: String, ds: DataSource) =
