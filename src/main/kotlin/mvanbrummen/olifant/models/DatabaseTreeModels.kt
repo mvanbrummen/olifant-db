@@ -9,10 +9,20 @@ data class DatabaseConnection(
 ) : DatabaseTreeItem(name, children)
 
 
-data class Database(override val name: String, val databaseConnectionName: String) : DatabaseTreeItem(name)
+data class Database(
+        override val name: String,
+        val databaseConnectionName: String,
+        override val children: List<DatabaseTreeItem>
+) : DatabaseTreeItem(name, children)
+
 data class Role(override val name: String, val databaseConnectionName: String) : DatabaseTreeItem(name)
 
-data class Schema(override val name: String, val databaseName: String) : DatabaseTreeItem(name)
+data class Schema(
+        override val name: String,
+        val databaseName: String,
+        override val children: List<DatabaseTreeItem>
+) : DatabaseTreeItem(name, children)
+
 data class Table(override val name: String, val schemaName: String) : DatabaseTreeItem(name)
 
 data class DatabaseRoot(
@@ -25,9 +35,17 @@ data class RolesRoot(
         override val children: List<Role> = emptyList()
 ) : DatabaseTreeItem("Roles", children)
 
-data class SchemaRoot(val databaseName: String) : DatabaseTreeItem("Schemas")
+data class SchemaRoot(
+        val databaseName: String,
+        override val children: List<DatabaseTreeItem>
+) : DatabaseTreeItem("Schemas", children)
 
-data class TableRoot(val schemaName: String) : DatabaseTreeItem("Tables")
+
+data class TableRoot(
+        val schemaName: String,
+        override val children: List<DatabaseTreeItem>
+) : DatabaseTreeItem("Tables", children)
+
 data class ViewRoot(val schemaName: String) : DatabaseTreeItem("Views")
 data class SequenceRoot(val schemaName: String) : DatabaseTreeItem("Sequences")
 data class FunctionRoot(val schemaName: String) : DatabaseTreeItem("Functions")
